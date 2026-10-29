@@ -160,8 +160,8 @@ footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
 
   <section class="card note">
     <span class="tag" style="background:var(--mt)">NOTE FROM OCI</span>
-    <p style="margin-top:6px">Hi bestie! I’m Oci, and I’m so happy you stopped by my little corner ♡ Pick your favorite app, send your payment proof, and I’ll get it ready for you with all my heart. Got any questions? Just chat me, okay~ 🍓</p>
-    <div class="row"><button class="b y" data-open="m-tnc">Aturan &amp; Garansi Toko [📜]</button></div>
+    <p style="margin-top:6px">Hi my beloved folks! I’m Oci, and I’m so happy you stopped by my little corner ♡ Pick your favorite app, send your payment proof, and I’ll get it ready for you with all my heart. Got any questions? Just chat me, okay~ 🍓</p>
+    <div class="row"><button class="b y" data-open="m-tnc">Sebelum Membeli Wajib Baca [📜]</button></div>
   </section>
 
   <section class="card" id="goods">
@@ -174,12 +174,12 @@ footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
 
   <section class="card" id="testi">
     <span class="tag">LITTLE LOVE NOTES</span>
-    <div data-px="Sweet Stories from Besties" data-s="20">Sweet Stories from Besties</div>
+    <div data-px="Sweet Stories from My Folks" data-s="20">Sweet Stories from My Folks</div>
     <p class="sub">Catatan manis dari mereka yang udah jajan di toko Oci 💌</p>
     <div class="row" style="margin-top:0"><button class="b" data-open="m-rev">Tulis Surat Ulasan ✎</button></div>
     <div class="memos" id="memos"></div>
   </section>
-  <footer>made with 🍎 &amp; crayons · oci’s little land ♡</footer>
+  <footer>made with 🍎 &amp; crayons · mochi’s little land ♡</footer>
 </div>
 
 <div class="ov" id="m-tnc"><div class="env2">
@@ -206,8 +206,8 @@ footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
   <button class="x" data-close aria-label="Tutup">✕</button>
   <h3>📖 Dear Diary Oci…</h3>
   <label>Nama / panggilan<input id="rn" maxlength="24" placeholder="misal: Nisa"></label>
-  <label>Ceritamu<textarea id="rt" rows="4" maxlength="160" placeholder="ceritain pengalaman jajan di sini ya ♡"></textarea></label>
-  <div class="row"><button class="b" id="rs">Kirim Cerita →</button><button class="b v" data-close>Batal</button></div>
+  <label>Testimu<textarea id="rt" rows="4" maxlength="160" placeholder="ceritain pengalaman jajan di sini ya ♡"></textarea></label>
+  <div class="row"><button class="b" id="rs">Kirim Testimoni →</button><button class="b v" data-close>Batal</button></div>
 </div></div>
 
 <div class="ov" id="m-pk"><div class="env2">
@@ -498,14 +498,14 @@ window.sendOciReview = async function() {
     nameInput.value = '';
     messageInput.value = '';
     document.querySelectorAll('.ov.on').forEach(el => el.classList.remove('on'));
-    alert('Makasih! Ceritamu sudah tersimpan dan bisa dilihat semua orang ♡');
+    alert('Timaaciw! Testimu sudah tersimpan dan bisa dilihat semua orang ♡');
   } catch (error) {
     console.error('Gagal mengirim ulasan:', error);
     alert('Belum berhasil mengirim review. Coba lagi sebentar ya ♡');
   } finally {
     sending = false;
     sendButton.disabled = false;
-    sendButton.textContent = 'Kirim Cerita →';
+    sendButton.textContent = 'Kirim Review →';
   }
 };
 </script>
