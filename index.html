@@ -98,6 +98,30 @@ button,a.b{font:inherit;color:inherit;cursor:pointer;text-decoration:none}
 input,textarea{width:100%;font:inherit;padding:7px 10px;margin:4px 0 8px;background:repeating-linear-gradient(#fff 0 24px,#ffe4ec 24px 25px);border:2.5px solid var(--br);border-radius:14px;color:var(--br)}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140px);z-index:70;background:var(--br);color:var(--bt);padding:8px 16px;border-radius:20px;transition:transform .4s cubic-bezier(.3,1.8,.5,1);max-width:90vw;text-align:center;font-size:14px}.toast.on{transform:translate(-50%,0)}
 footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
+
+/* Oci's Little Land — halaman tambahan mengikuti gaya kartu asli */
+.oci-menu-btn{flex:none;font-size:22px}
+.oci-screen{display:none}.oci-screen.active{display:block}
+.oci-side-shade{display:none;position:fixed;inset:0;background:#6b443a88;z-index:80}.oci-side-shade.show{display:block}
+.oci-side{position:fixed;z-index:81;left:0;top:0;bottom:0;width:min(310px,85vw);background:var(--va);border-right:4px solid var(--br);box-shadow:6px 0 0 #ff6b8b55;padding:25px 18px;transform:translateX(-105%);transition:transform .25s ease;display:flex;flex-direction:column;gap:12px}
+.oci-side.show{transform:translateX(0)}.oci-side h2{font:italic 700 25px var(--f);color:var(--pk2);margin:12px 0 18px}
+.oci-side button{padding:13px;text-align:left;border:2.5px solid var(--br);background:#ffe4ec;border-radius:18px;font-weight:700;box-shadow:3px 3px 0 #6b443a33}.oci-side button:active{transform:translateY(2px)}
+.oci-side .oci-close{align-self:flex-end;padding:4px 12px}.oci-side .oci-bottom{margin-top:auto;font-size:13px;overflow-wrap:anywhere}
+.oci-page-head{text-align:center;padding:28px 15px 0}.oci-page-head h1{font:italic 700 29px var(--f);color:var(--pk2)}.oci-page-head p{font-style:italic;margin-top:7px}
+.oci-accordion{width:100%;padding:12px;text-align:left;border:2.5px solid var(--br);border-radius:17px;background:#fff7c2;font:700 15px var(--f);margin:8px 0;box-shadow:3px 4px 0 #6b443a33}
+.oci-accordion-panel{display:none;padding:8px 5px 12px;font-size:14px;line-height:1.6}.oci-accordion-panel.show{display:block}
+.oci-loyalty{position:relative;background:#ffbdd0;border:3px solid var(--br);border-radius:24px;padding:22px 14px 17px;box-shadow:4px 5px 0 #6b443a40;text-align:center;margin-top:15px}
+.oci-loyalty:before{content:'';position:absolute;inset:7px;border:2px dashed #fffdf8;border-radius:17px;pointer-events:none}
+.oci-loyalty>*{position:relative}.oci-loyalty h2{font:italic 700 24px var(--f);color:var(--br)}.oci-loyalty p{font-size:13px;margin-top:5px}
+.oci-stamps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:23px 0 18px}
+.oci-stamp{aspect-ratio:1/1.12;background:var(--va);border:2px dashed var(--pk2);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:2px 3px 0 #6b443a30;min-width:0}
+.oci-stamp small{font-size:10px;color:var(--br)}.oci-stamp span{font-size:22px;filter:grayscale(1);opacity:.4}.oci-stamp.reward{background:#fff7c2}.oci-stamp.reward span{filter:none;opacity:1}
+.oci-progress{padding:8px;border:2px solid var(--br);border-radius:20px;background:#fff7c2;font-weight:700;font-size:14px}
+.oci-stamp-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}.oci-stamp-actions input{flex:1;min-width:140px;margin:0}.oci-stamp-actions button{flex:1}
+.oci-invoice{padding:14px;background:#fffdf8;border:2.5px solid var(--br);border-radius:17px;margin:13px 0;box-shadow:3px 4px 0 #6b443a33}.oci-invoice b{color:var(--pk2)}.oci-invoice small{display:block;margin:5px 0}.oci-invoice .row{justify-content:flex-start}
+.oci-login{position:fixed;z-index:95;inset:0;background:linear-gradient(140deg,#ffe4ec,#fffdf8 55%,#e6f4d0);display:flex;align-items:center;justify-content:center;padding:20px}.oci-login.hidden{display:none}
+.oci-login-card{width:min(410px,100%);background:var(--va);border:3px solid var(--br);border-radius:26px;padding:28px 20px;text-align:center;box-shadow:5px 7px 0 #6b443a40;outline:2px dashed var(--pk);outline-offset:-10px}.oci-login-card h1{font:italic 700 29px var(--f);color:var(--pk2)}.oci-login-card p{margin:10px 0 16px;font-size:14px}.oci-login-card input{text-align:center}
+
 </style>
 </head>
 <body>
@@ -122,6 +146,7 @@ footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
 
 <div class="app">
   <div class="nav">
+    <button class="ib oci-menu-btn" id="oci-menu-open" aria-label="Buka menu">☰</button>
     <span class="logo">oci’s little land ໒꒱</span>
     <div class="ic">
       <button class="ib" id="snd" aria-label="Suara">🔊</button>
@@ -131,6 +156,7 @@ footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
     <div class="mp"><div class="mt"><span id="mt">♪ memuat lagu…</span></div><button class="mb" id="pv" aria-label="Sebelumnya">⏮</button><button class="mb" id="pp" aria-label="Putar/Jeda">▶</button><button class="mb" id="nx" aria-label="Berikutnya">⏭</button></div>
   </div>
 
+  <main id="oci-home" class="oci-screen active">
   <section class="card hero" style="margin-top:36px">
     <span class="tag">OCI’S PICNIC BASKET</span><span class="rib">READY TO SERVE!</span>
     <div class="kids">
@@ -179,9 +205,36 @@ footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
     <div class="row" style="margin-top:0"><button class="b" data-open="m-rev">Tulis Surat Ulasan ✎</button></div>
     <div class="memos" id="memos"></div>
   </section>
+  </main>
+  <section class="oci-screen" id="oci-orders">
+    <div class="oci-page-head"><h1>Riwayat Invoice 🧾</h1><p>Catatan pesanan yang kamu mulai dari perangkat ini ♡</p></div>
+    <section class="card"><span class="tag">PAYMENT DIARY</span><div data-px="My Sweet Orders" data-s="22">My Sweet Orders</div>
+      <p class="sub">Pesanan yang dibuka lewat tombol Order akan tercatat di sini. Belum termasuk bukti pembayaran.</p>
+      <div id="oci-order-list"></div>
+    </section>
+  </section>
+  <section class="oci-screen" id="oci-rewards">
+    <div class="oci-page-head"><h1>Loyalty Card 🍓</h1><p>Sweet little treats for Oci's besties ♡</p></div>
+    <section class="card"><span class="tag">STRAWBERRY REWARDS</span>
+      <button class="oci-accordion" data-oci-accordion="oci-rules">♡ Aturan Loyalty Card 🍓 <span style="float:right">⌄</span></button>
+      <div class="oci-accordion-panel" id="oci-rules"><p>🎀 Simpan bukti pembelianmu dan hubungi Oci untuk menanyakan stamp.</p><p>🍓 Stamp hanya diberikan setelah transaksi diverifikasi oleh admin.</p><p>💌 Syarat nominal pembelian, jumlah stamp, dan hadiah ditentukan oleh Oci sebelum program diaktifkan.</p></div>
+      <div class="oci-loyalty"><div style="font-size:24px">🎀 🍓 💌 🍎</div><h2>Little Loyalty Card</h2><p>Oci's Little Land · sweet rewards diary</p>
+        <div class="oci-stamps"><div class="oci-stamp"><small>01</small><span>🍓</span></div><div class="oci-stamp"><small>02</small><span>🍎</span></div><div class="oci-stamp"><small>03</small><span>🎀</span></div><div class="oci-stamp reward"><small>04</small><span>🎁</span></div><div class="oci-stamp"><small>05</small><span>🍓</span></div><div class="oci-stamp"><small>06</small><span>🍎</span></div><div class="oci-stamp"><small>07</small><span>🎀</span></div><div class="oci-stamp reward"><small>08</small><span>🎁</span></div></div>
+        <div class="oci-progress">🍓 0 / 8 stamp · menunggu aktivasi program ♡</div><p>made with strawberries & love ♡</p>
+      </div>
+      <div class="oci-stamp-actions"><input id="oci-stamp-code" maxlength="40" placeholder="Masukkan kode stamp"><button class="b" id="oci-stamp-submit">Tempel Stamp 🍓</button></div>
+      <p style="font-size:13px;margin-top:9px">Kode stamp belum diaktifkan. Hubungi Oci untuk verifikasi pembelian dan informasi program ♡</p>
+      <button class="oci-accordion" data-oci-accordion="oci-gifts">🎁 Hadiah <span style="float:right">⌄</span></button>
+      <div class="oci-accordion-panel" id="oci-gifts">Hadiah dan syarat penukaran akan diumumkan Oci setelah program loyalty resmi aktif. ♡</div>
+      <div class="row"><a class="b g" id="oci-reward-chat" target="_blank" rel="noopener">Tanya Stamp ke Oci ↗</a></div>
+    </section>
+  </section>
   <footer>made with 🍎 &amp; crayons · mochi’s little land ♡</footer>
 </div>
 
+<div class="oci-side-shade" id="oci-menu-shade"></div>
+<aside class="oci-side" id="oci-menu" aria-label="Menu Oci's Little Land"><button class="oci-close" id="oci-menu-close">✕</button><h2>MENU 🍓🎀</h2><button data-oci-page="oci-home">🏠 Beranda</button><button data-oci-page="oci-orders">🧾 Riwayat Invoice</button><button data-oci-page="oci-rewards">💌 Loyalty Card</button><div class="oci-bottom"><p>oci's little land ♡</p><p id="oci-menu-phone"></p><button id="oci-switch-phone" style="margin-top:12px">Ganti nomor HP</button></div></aside>
+<div class="oci-login" id="oci-login"><form class="oci-login-card" id="oci-login-form"><div style="font-size:35px">🍓🎀🍎</div><h1>Welcome to Oci's Little Land!</h1><p>Tulis nomor HP kamu untuk masuk ke little corner ini ♡<br><small>Tanpa OTP · hanya disimpan di perangkat ini.</small></p><input id="oci-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx" required maxlength="18"><button class="b" type="submit">Masuk ke Little Land ♡</button><p style="font-size:12px">Nomor ini bukan verifikasi identitas dan tidak membuka data pesanan pribadi dari database.</p></form></div>
 <div class="ov" id="m-tnc"><div class="env2">
   <button class="x" data-close aria-label="Tutup">✕</button>
   <h3>📜 Sebelum Membeli Wajib Baca</h3>
@@ -508,6 +561,32 @@ window.sendOciReview = async function() {
     sendButton.textContent = 'Kirim Review →';
   }
 };
+</script>
+
+<script>
+/* Halaman Oci tambahan: penyimpanan lokal saja, bukan autentikasi */
+(function(){
+'use strict';
+const get=id=>document.getElementById(id);
+const storage={read(k){try{return localStorage.getItem(k)}catch(e){return null}},write(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const phoneKey='oci_phone_v1';
+function refreshLogin(){const p=storage.read(phoneKey);get('oci-login').classList.toggle('hidden',!!p);get('oci-menu-phone').textContent=p?'📱 '+p:'';}
+get('oci-login-form').addEventListener('submit',function(e){e.preventDefault();const p=get('oci-phone').value.replace(/[^0-9+]/g,'');if(!/^(?:\+?62|0)[0-9]{8,13}$/.test(p)){alert('Masukkan nomor HP Indonesia yang benar ya ♡');return;}storage.write(phoneKey,p);refreshLogin();});
+function closeMenu(){get('oci-menu').classList.remove('show');get('oci-menu-shade').classList.remove('show')}
+get('oci-menu-open').onclick=()=>{get('oci-menu').classList.add('show');get('oci-menu-shade').classList.add('show')};
+get('oci-menu-close').onclick=closeMenu;get('oci-menu-shade').onclick=closeMenu;
+document.querySelectorAll('[data-oci-page]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.oci-screen').forEach(el=>el.classList.toggle('active',el.id===btn.dataset.ociPage));closeMenu();window.scrollTo({top:0,behavior:'smooth'});}));
+get('oci-switch-phone').onclick=()=>{closeMenu();storage.del(phoneKey);get('oci-phone').value='';refreshLogin()};
+document.querySelectorAll('[data-oci-accordion]').forEach(btn=>btn.addEventListener('click',()=>get(btn.dataset.ociAccordion).classList.toggle('show')));
+get('oci-stamp-submit').onclick=()=>alert('Program kode stamp belum aktif yaa ♡ Hubungi Oci untuk verifikasi dan informasi stamp.');
+get('oci-reward-chat').href='https://wa.me/62881012310046?text='+encodeURIComponent('Halo kak Oci! Aku mau tanya tentang Loyalty Card dan kode stamp 🍓');
+const ordersKey='oci_order_drafts_v1';
+function loadOrders(){try{const a=JSON.parse(storage.read(ordersKey)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
+function renderOrders(){const box=get('oci-order-list');box.replaceChildren();const a=loadOrders();if(!a.length){const p=document.createElement('p');p.className='sub';p.textContent='Belum ada catatan order di perangkat ini. Yuk pilih goodies di Beranda! 🍓';box.append(p);return;}a.forEach((item,i)=>{const c=document.createElement('div');c.className='oci-invoice';const sm=document.createElement('small');sm.textContent=new Date(item.date).toLocaleString('id-ID');const title=document.createElement('b');title.textContent='🧾 Catatan Order #'+String(a.length-i).padStart(3,'0');const d=document.createElement('p');d.textContent=item.product+' · '+item.package;const price=document.createElement('b');price.textContent=item.price;const status=document.createElement('small');status.textContent='Status: draft order · pembayaran belum terverifikasi';const row=document.createElement('div');row.className='row';const link=document.createElement('a');link.className='b';link.target='_blank';link.rel='noopener';link.textContent='Chat Oci ↗';link.href='https://wa.me/62881012310046?text='+encodeURIComponent(item.message);const remove=document.createElement('button');remove.className='b v';remove.textContent='Hapus';remove.onclick=()=>{const arr=loadOrders();arr.splice(i,1);storage.write(ordersKey,JSON.stringify(arr));renderOrders()};row.append(link,remove);c.append(sm,title,d,price,status,row);box.append(c)})}
+/* Simpan catatan saat pembeli klik tombol Order di katalog; bukan invoice resmi. */
+document.addEventListener('click',e=>{const btn=e.target.closest('[data-order]');if(!btn)return;const modal=get('m-pk');const product=get('pt').textContent.replace(/ — pilih paket$/,'');const rows=Array.from(get('pb').querySelectorAll('[data-order]'));const row=btn.closest('.vr');const pack=row?.querySelector('div')?.textContent||'';const price=row?.querySelector('.pr')?.textContent||'';const msg='Halo kak Oci! Aku mau order '+product+' – '+pack+'. Aku sudah baca aturan & garansi tokonya ya ♡';const a=loadOrders();a.unshift({date:new Date().toISOString(),product,package:pack.replace(price,''),price,message:msg});storage.write(ordersKey,JSON.stringify(a.slice(0,50)));renderOrders();},true);
+renderOrders();refreshLogin();
+})();
 </script>
 </body>
 </html>
