@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- GitHub Pages: simpan sebagai index.html di root repository.
+     Lagu: upload audio/cherish-my-love.mp3 hanya jika punya hak/izin penggunaan.
+     Profil X: sinkronisasi pihak ketiga bersifat best-effort, fallback otomatis.
+     Ulasan tersimpan melalui Firebase Cloud Firestore. -->
 <html lang="id">
 <head>
 <meta charset="utf-8">
@@ -190,19 +194,19 @@ footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
     <li>Sisa masa aktif 1–5 hari pada akun tetap terhitung sebulan penuh, ya.</li>
     <li>Mari saling menghargai dan berkomunikasi dengan sopan agar transaksi nyaman.</li>
     <li>Hindari mengganti email akun yang ada keterangan dendanya demi keamanan bersama.</li>
-    <li>Kalau ada akun yang bermasalah, kirim format garansi dan tunggu proses perbaikan 1–3 hari yaa. Ingat ini blackmarket, meskipun kamu membeli tapi kamu membeli dengan harga yg lebih murah daripada di toko aslinya, jadi harap bersabar.</li>
+    <li>Kalau ada akun yang bermasalah, kirim format garansi dan tunggu proses perbaikan 1–3 hari yaa. Ingat ini blackmarket, meskipun kamu membeli tapi kamu membeli dengan harga yg lebih murah daripada di toko aslinya, jadi harap bersabar</li>
     <li>Kalau merasa belum cocok dengan ketentuan ini, tidak apa-apa untuk batal order dulu.</li>
   </ul>
   <ul class="pane" id="t2"><li>Pastikan username Roblox sudah benar sebelum membayar ya.</li><li>Pengiriman via Send, diproses setelah pembayaran masuk.</li><li>Mohon bersabar, admin pasti proses secepat mungkin di sela kesibukan.</li><li>Salah input data bukan tanggung jawab toko, ya.</li></ul>
   <ul class="pane" id="t3"><li>Isi User ID &amp; Zone ID dengan teliti sebelum membayar.</li><li>Orderan akan langsung diproses begitu pembayaran sudah masuk.</li><li>Mohon bersabar, admin pasti proses secepat mungkin.</li><li>Pesanan yang sudah diproses tidak bisa dibatalkan, ya.</li></ul>
-  <div class="row"><button class="b" data-close>Got it! ♡</button></div>
+  <div class="row"><button class="b" data-close>Siap, paham! ♡</button></div>
 </div></div>
 
 <div class="ov" id="m-rev"><div class="env2">
   <button class="x" data-close aria-label="Tutup">✕</button>
   <h3>📖 Dear Diary Oci…</h3>
   <label>Nama / panggilan<input id="rn" maxlength="24" placeholder="misal: Nisa"></label>
-  <label>Reviewmu<textarea id="rt" rows="4" maxlength="160" placeholder="ceritain pengalaman jajan di sini ya ♡"></textarea></label>
+  <label>Ceritamu<textarea id="rt" rows="4" maxlength="160" placeholder="ceritain pengalaman jajan di sini ya ♡"></textarea></label>
   <div class="row"><button class="b" id="rs">Kirim Cerita →</button><button class="b v" data-close>Batal</button></div>
 </div></div>
 
@@ -333,22 +337,27 @@ done:function(){[659,784,988,1319,1568].forEach(function(f,i){tone(f,i*.07,.28,"
 function sfx(n){if(!master)return;ensure();(SFX[n]||SFX.pop)()}
 
 /* ===== playlist ===== */
-var au=new Audio(),ti=0;au.volume=.45;au.preload="auto";
+var au=new Audio(),ti=0;au.volume=.45;au.preload="none";
 function loadT(){au.src=PL[ti].src;$("#mt").textContent="♪ "+PL[ti].t+" — "+PL[ti].a+"  ♡"}
-function playM(){if(!master||userPaused)return;var p=au.play();if(p&&p.catch)p.catch(function(){})}
-function next(d){ti=(ti+d+PL.length)%PL.length;loadT();playM()}
+function playM(){if(!master||userPaused||au.error)return;var p=au.play();if(p&&p.catch)p.catch(function(){toast("Ketuk ▶ untuk memutar musik ♡")})}
+function next(d){if(box){toast("Playlist baru punya satu lagu ♡");return}ti=(ti+d+PL.length)%PL.length;loadT();playM()}
 au.addEventListener("ended",function(){PL.length>1?next(1):(au.currentTime=0,playM())});
 au.addEventListener("play",function(){$("#pp").textContent="⏸"});
 au.addEventListener("pause",function(){$("#pp").textContent="▶"});
-/* cadangan: kalau mp3 belum ada, putar music box imut buatan sendiri */
+/* cadangan: bila file MP3 belum tersedia, putar melodi orisinal sederhana, bukan lagu ILLIT */
 var box=null,bi=0,BN=[523,659,784,988,784,659,880,1047,880,659,784,659,587,698,880,698];
-function boxStart(){if(box)return;ensure();$("#mt").textContent="♪ Little Land Lullaby (music box) ♡";$("#pp").textContent="⏸";box=setInterval(function(){if(!master||userPaused||!ctx||ctx.state!=="running")return;var f=BN[bi++%BN.length];tone(f,0,.9,"sine",.07);tone(f*2,0,.5,"triangle",.025)},380)}
-au.addEventListener("error",boxStart);
-loadT();playM();
-document.addEventListener("pointerdown",function f(){ensure();if(au.error)boxStart();else if(au.paused)playM();document.removeEventListener("pointerdown",f)},{once:true});
-$("#pp").onclick=function(){if(au.error){userPaused=!userPaused;this.textContent=userPaused?"▶":"⏸";if(!userPaused){master=true;$("#snd").textContent="🔊";ensure();boxStart()}return}if(au.paused){userPaused=false;master=true;$("#snd").textContent="🔊";au.play().catch(function(){})}else{userPaused=true;au.pause()}};
+function boxStart(){if(box||userPaused||!master)return;ensure();$("#mt").textContent="♪ Little Land Lullaby (music box) ♡";$("#pp").textContent="⏸";box=setInterval(function(){if(!master||userPaused||!ctx||ctx.state!=="running")return;var f=BN[bi++%BN.length];tone(f,0,.9,"sine",.07);tone(f*2,0,.5,"triangle",.025)},380)}
+au.addEventListener("error",function(){ $("#mt").textContent="♪ MP3 belum tersedia — tekan ▶ untuk musik box ♡"; });
+loadT();
+$("#pp").onclick=function(){
+  ensure();master=true;$("#snd").textContent="🔊";
+  if(box){userPaused=!userPaused;this.textContent=userPaused?"▶":"⏸";return}
+  if(au.error){userPaused=false;boxStart();return}
+  if(au.paused){userPaused=false;au.play().catch(function(){toast("File lagu belum bisa diputar. Pastikan audio/cherish-my-love.mp3 sudah di-upload ♡")})}
+  else{userPaused=true;au.pause()}
+};
 $("#pv").onclick=function(){next(-1)};$("#nx").onclick=function(){next(1)};
-$("#snd").onclick=function(){master=!master;this.textContent=master?"🔊":"🔇";if(master){ensure();SFX.pop();playM()}else au.pause()};
+$("#snd").onclick=function(){master=!master;this.textContent=master?"🔊":"🔇";if(master){ensure();SFX.pop();if(box){userPaused=false;$("#pp").textContent="⏸"}else playM()}else{au.pause();$("#pp").textContent="▶"}};
 
 /* ===== logo app: taruh gambar di logos/<nama-app>.png, kalau tidak ada tampil monogram ===== */
 function mono(n){var w=n.replace(/[^A-Za-z0-9+ ]/g," ").trim().split(/\s+/);return (w.length>1?w[0][0]+w[1][0]:w[0][0]).toUpperCase()}
@@ -376,7 +385,7 @@ function pick(i){
 function waUrl(msg){return "https://wa.me/"+WA+"?text="+encodeURIComponent(msg)}
 function order(i,k){
   var p=D[CATS[cur][0]][i],x=p[1][k];
-  var msg="Halo kak Oci! Aku mau order "+p[0]+" – "+x[0]+" ("+rp(x[1])+"). Aku sudah baca terms and condition tokonya ♡";
+  var msg="Halo kak Oci! Aku mau order "+p[0]+" – "+x[0]+" ("+rp(x[1])+"). Aku sudah baca aturan & garansi tokonya ya ♡";
   sfx("done");
   try{navigator.clipboard.writeText(msg)}catch(e){}
   $("#om").innerHTML='<div class="memo" style="margin-top:14px">'+esc(msg)+'</div><p style="margin-top:8px;font-size:14px">Kalau WhatsApp tidak terbuka otomatis, salin pesan di atas dan kirim ke <b>0881-0123-10046</b> ♡</p>';
@@ -384,7 +393,7 @@ function order(i,k){
   toast("Membuka WhatsApp Oci ♡");
   var w=window.open(waUrl(msg),"_blank","noopener");if(!w)location.href=waUrl(msg);
 }
-$("#wa").href=waUrl("Halo kak Oci! Aku mau order produknya Kak Oci, nih ♡");
+$("#wa").href=waUrl("Halo kak Oci! Aku mau tanya-tanya soal produk di Oci’s Little Land ♡");
 if(/claude/i.test(location.hostname)){$("#wa").onclick=function(e){e.preventDefault();toast("WhatsApp Oci: 0881-0123-10046 ♡")}}
 document.addEventListener("click",function(e){
   var t=e.target,m;
@@ -402,9 +411,9 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")closeAll()})
 $("#bell").onclick=function(){toast("Beruang bilang: belum ada kabar baru, tapi kamu manis banget 🐻");sfx("heart")};
 $("#wl").onclick=function(){toast(wn+" item di wishlist-mu 🎀");sfx("pop")};
 $("#rs").onclick=function(){
-  var n=$("#rn").value.trim(),t=$("#rt").value.trim();
-  if(!n||!t){toast("Isi nama & ceritamu dulu ya ♡");sfx("pop");return}
-  REV.unshift([t,n]);renderMemos();$("#rn").value="";$("#rt").value="";$$(".ov.on").forEach(function(x){x.classList.remove("on")});toast("Makasih ceritanya! ♡");sfx("done")};
+  if(typeof window.sendOciReview === "function") window.sendOciReview();
+  else toast("Sedang menghubungkan ulasan, coba sebentar lagi ♡");
+};
 
 /* ===== judul pixel-script (gaya Figure 8 Market) ===== */
 async function pix(el){
@@ -432,13 +441,73 @@ function applyProfile(d){
 }
 function limit(ms){return new Promise(function(_,r){setTimeout(function(){r(new Error("timeout"))},ms)})}
 async function fetchProfile(user){
-  var res=await Promise.race([fetch("https://api.fxtwitter.com/"+user,{headers:{Accept:"application/json"}}),limit(4000)]);
+  var res=await Promise.race([fetch("https://api.fxtwitter.com/"+encodeURIComponent(user),{headers:{Accept:"application/json"}}),limit(4000)]);
   if(!res.ok)throw new Error("HTTP "+res.status);
   var u=(await res.json()).user;if(!u)throw new Error("no data");
   return {name:u.name,handle:"@"+u.screen_name,bio:u.description,followers:u.followers_count!=null?u.followers_count:u.followers,avatar:(u.avatar_url||"").replace("_normal","_400x400")};
 }
+applyProfile(FALLBACK);
 fetchProfile("lfabubu").then(applyProfile).catch(function(){applyProfile(FALLBACK)});
 })();
+</script>
+
+<!-- Firebase: review publik tersimpan di Cloud Firestore -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBr5mX1ZIy4HcYU2IsbjoI0JWwRlocW1ZE",
+  authDomain: "ocis-little-land.firebaseapp.com",
+  projectId: "ocis-little-land",
+  storageBucket: "ocis-little-land.firebasestorage.app",
+  messagingSenderId: "645650600100",
+  appId: "1:645650600100:web:0b7b7f8c6ae8d64998d631",
+  measurementId: "G-X2QTXZGV5D"
+};
+
+const db = getFirestore(initializeApp(firebaseConfig));
+const escapeText = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const memoBox = document.getElementById('memos');
+const sendButton = document.getElementById('rs');
+
+onSnapshot(query(collection(db, 'reviews'), orderBy('createdAt', 'desc'), limit(60)), snapshot => {
+  memoBox.innerHTML = snapshot.docs.map(doc => {
+    const item = doc.data();
+    return '<div class="memo">' + escapeText(item.message || '') + '<b>— ' + escapeText(item.name || 'Anonim') + '</b></div>';
+  }).join('') || '<div class="memo">Belum ada cerita, yuk jadi yang pertama! ♡</div>';
+}, error => {
+  console.error('Tidak bisa memuat ulasan:', error);
+  memoBox.innerHTML = '<div class="memo">Ulasan belum bisa dimuat. Coba refresh nanti ya ♡</div>';
+});
+
+let sending = false;
+window.sendOciReview = async function() {
+  if (sending) return;
+  const nameInput = document.getElementById('rn');
+  const messageInput = document.getElementById('rt');
+  const name = nameInput.value.trim();
+  const message = messageInput.value.trim();
+  if (!name || !message) { alert('Isi nama dan ceritamu dulu ya ♡'); return; }
+  if (name.length > 40 || message.length > 500) { alert('Ulasannya terlalu panjang ya ♡'); return; }
+  sending = true;
+  sendButton.disabled = true;
+  sendButton.textContent = 'Mengirim... ♡';
+  try {
+    await addDoc(collection(db, 'reviews'), { name, message, createdAt: serverTimestamp() });
+    nameInput.value = '';
+    messageInput.value = '';
+    document.querySelectorAll('.ov.on').forEach(el => el.classList.remove('on'));
+    alert('Makasih! Ceritamu sudah tersimpan dan bisa dilihat semua orang ♡');
+  } catch (error) {
+    console.error('Gagal mengirim ulasan:', error);
+    alert('Belum berhasil mengirim review. Coba lagi sebentar ya ♡');
+  } finally {
+    sending = false;
+    sendButton.disabled = false;
+    sendButton.textContent = 'Kirim Cerita →';
+  }
+};
 </script>
 </body>
 </html>
