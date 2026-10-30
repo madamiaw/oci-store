@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<!-- GitHub Pages: simpan sebagai index.html di root repository.
+     Lagu: upload audio/cherish-my-love.mp3 hanya jika punya hak/izin penggunaan.
+     Profil X: sinkronisasi pihak ketiga bersifat best-effort, fallback otomatis.
+     Ulasan tersimpan melalui Firebase Cloud Firestore. -->
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oci’s Little Land</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500;1,9..144,700&family=Playball&display=swap" rel="stylesheet">
+<style>
+:root{--pk:#ff6b8b;--pk2:#ff4d79;--mt:#99cc66;--mt2:#a8d582;--bt:#fff275;--br:#6b443a;--va:#fffdf8;--bg1:#ffe4ec;--bg2:#fff0f5;--f:'Fraunces',Georgia,serif;color-scheme:light}
+*{box-sizing:border-box;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{font-family:var(--f);font-weight:500;font-size:16px;line-height:1.3;color:var(--br);background-color:var(--bg2);
+background-image:repeating-linear-gradient(0deg,#ff6b8b22 0 22px,transparent 22px 44px),repeating-linear-gradient(90deg,#ff6b8b22 0 22px,transparent 22px 44px);
+padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+button,a.b{font:inherit;color:inherit;cursor:pointer;text-decoration:none}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--va);background-image:repeating-linear-gradient(0deg,#ffe4ec99 0 20px,transparent 20px 40px),repeating-linear-gradient(90deg,#ffe4ec99 0 20px,transparent 20px 40px);box-shadow:0 0 0 4px var(--pk),0 0 0 9px var(--va),0 12px 40px #6b443a44;padding-bottom:30px;position:relative;overflow:clip}
+/* nav + player */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px;padding:8px 12px;background:var(--bg1);border-bottom:3px dashed var(--pk)}
+.logo{font:italic 700 18px var(--f);color:var(--pk2)}
+.ic{display:flex;gap:6px}
+.ib{position:relative;width:36px;height:36px;border-radius:50%;background:var(--va);border:2.5px solid var(--br);font-size:17px;box-shadow:2px 3px 0 #6b443a40;transition:transform .25s cubic-bezier(.3,1.8,.5,1)}
+.ib:hover{transform:scale(1.15) rotate(-6deg)}.ib:active{transform:scale(.9)}
+.bd{position:absolute;top:-6px;right:-6px;background:var(--pk2);color:#fff;font:700 11px var(--f);border-radius:10px;padding:1px 5px;border:2px solid var(--br)}
+/* V16: kaset mini yang berputar saat musik menyala */
+.oci-cassette{width:37px;height:30px;flex:none;border:2px solid var(--br);border-radius:7px;background:#ffb8cf;display:grid;place-items:center;position:relative;box-shadow:2px 2px 0 #6b443a33}
+.oci-cassette::before{content:"";position:absolute;inset:4px;border-radius:4px;background:#fff8e7;border:1px solid #b76b79}
+.oci-reels{position:relative;z-index:1;font-size:19px;line-height:1}
+.oci-cassette.playing .oci-reels{animation:oci-spin 2s linear infinite}
+@keyframes oci-spin{to{transform:rotate(360deg)}}
+.oci-open-closed{background:#ffd9e3!important}
+.oci-open-closed i{color:#ee6287!important}
+.mp{width:100%;display:flex;align-items:center;gap:5px;background:var(--va);border:2.5px solid var(--br);border-radius:18px;padding:2px 6px;font-size:14px}
+.mt{flex:1;overflow:hidden;white-space:nowrap}.mt span{display:inline-block;animation:mq 9s linear infinite}
+@keyframes mq{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+.mb{border:0;background:none;font-size:15px;padding:2px 4px;transition:transform .2s cubic-bezier(.3,1.8,.5,1)}.mb:active{transform:scale(.8)}
+/* cards */
+.card{position:relative;margin:30px 14px 14px;background:var(--va);border:3px solid var(--br);border-radius:26px;padding:18px 14px 14px;box-shadow:4px 5px 0 #6b443a40}
+.card::before{content:"";position:absolute;left:14px;right:14px;top:-11px;height:11px;background:radial-gradient(circle at 9px 11px,var(--pk) 7px,transparent 8px) 0 0/18px 11px repeat-x}
+.card::after{content:"";position:absolute;inset:5px;border:2px dashed #ff6b8b99;border-radius:20px;pointer-events:none}
+.card>*{position:relative;z-index:1}
+.tag{position:absolute;z-index:3;top:-20px;left:50%;transform:translateX(-50%) rotate(-2deg);white-space:nowrap;background:var(--pk);color:#fff;font:italic 700 13px var(--f);border:2.5px solid var(--br);border-radius:14px;padding:3px 14px}
+[data-px]{font:400 26px 'Playball',cursive;color:var(--pk2);text-align:center;margin:4px 0;line-height:1.1}
+[data-px] canvas{display:inline-block;max-width:100%}
+.sub{text-align:center;margin-bottom:10px;font-style:italic}
+.hero{background:linear-gradient(#ffe4ec,#e3f2fb);text-align:center}
+.hero small{font:italic 700 15px var(--f)}
+.kids{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:6px 0}
+.kids svg{width:100%;height:auto;animation:bob 2.8s ease-in-out infinite}.kids svg:nth-child(even){animation-delay:-1.4s}.kids svg:nth-child(3n){animation-delay:-.7s}
+@keyframes bob{50%{transform:translateY(-5px) rotate(2deg)}}
+.rib{position:absolute;right:-10px;top:-2px;z-index:4;background:var(--bt);border:2.5px solid var(--br);border-radius:6px;padding:2px 12px;font:italic 700 12px var(--f);transform:rotate(7deg);box-shadow:2px 3px 0 #6b443a40}
+/* buttons */
+.b{display:inline-block;background:var(--pk);color:#fff;border:2.5px solid var(--br);border-radius:18px;padding:5px 14px;font:italic 700 15px var(--f);box-shadow:0 4px 0 var(--br);transition:transform .25s cubic-bezier(.3,1.8,.5,1),box-shadow .15s}
+.b:hover{transform:translateY(-3px) scale(1.05)}.b:active{transform:translateY(3px);box-shadow:0 1px 0 var(--br)}
+.b.g{background:var(--mt2);color:var(--br)}.b.v{background:var(--va);color:var(--br)}.b.y{background:var(--bt);color:var(--br)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;justify-content:center}
+/* profile envelope */
+.env{padding:0;background:var(--va);border-radius:8px;margin-top:34px;border:10px solid transparent;border-image:repeating-linear-gradient(135deg,var(--pk) 0 14px,#fff 14px 28px,#7ec0ee 28px 42px) 10}
+.env::before,.env::after{display:none}
+.env .in{margin:9px;padding:14px;border:2.5px solid var(--br);border-radius:6px;background:var(--va)}
+.pf{display:flex;gap:12px;align-items:center}
+.av{width:88px;height:88px;flex:none;border-radius:50%;padding:6px;background:repeating-conic-gradient(var(--pk) 0 10deg,var(--va) 10deg 20deg)}
+#profile-avatar{width:100%;height:100%;border-radius:50%;overflow:hidden;background:#ffe4ec;border:2.5px solid var(--br);display:grid;place-items:center}
+#profile-avatar svg{width:96%;height:96%}#profile-avatar img{width:100%;height:100%;object-fit:cover}
+.ld{animation:wob .8s ease-in-out infinite}@keyframes wob{25%{transform:rotate(-8deg) scale(1.05)}75%{transform:rotate(8deg) scale(.95)}}
+.sk{opacity:.55;animation:pul 1s infinite}@keyframes pul{50%{opacity:.2}}
+#profile-name{font:700 23px var(--f)}#profile-handle{color:var(--pk2);font-weight:700}
+#profile-bio{margin:10px 0;padding:6px 10px;background:repeating-linear-gradient(#fff 0 22px,#ffd3de 22px 23px);border-radius:10px;border:2px solid var(--br);line-height:22px;font-size:15px}
+.st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.st div{text-align:center;padding:6px 2px;background:var(--bt);border:3px dotted var(--br);border-radius:6px;font-size:13px;line-height:1.1}
+.st b{display:block;font:700 20px var(--f);color:var(--pk2)}.st div:nth-child(2){background:#d9efbf}.st div:nth-child(3){background:#ffd3de}
+.open{display:inline-block;margin-top:10px;padding:2px 12px;background:#d9efbf;border:2px solid var(--br);border-radius:14px;font-size:14px}
+.open i{color:#3fae3f;font-style:normal;animation:pul 1.2s infinite}
+.note{background:#fff7c2}
+/* catalog */
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:2.5px solid var(--br);border-radius:16px;background:var(--va);padding:2px 12px;font:italic 700 14px var(--f);transition:transform .25s cubic-bezier(.3,1.8,.5,1)}
+.chip.on{background:var(--pk);color:#fff;transform:rotate(-2deg) scale(1.08)}
+.grid{display:grid;gap:10px}
+.pc{display:flex;align-items:center;gap:10px;border:2.5px solid var(--br);border-radius:22px;padding:8px 10px;box-shadow:3px 4px 0 #6b443a33;transition:transform .25s cubic-bezier(.3,1.8,.5,1)}
+.pc:hover{transform:translateY(-3px) rotate(-.7deg)}
+.pi{position:relative;width:54px;height:54px;flex:none;border-radius:16px;border:2.5px solid var(--br);box-shadow:2px 3px 0 #6b443a40;display:grid;place-items:center;color:#fff;font:700 18px var(--f);text-shadow:1px 1px 0 #0003;overflow:hidden}
+.pi img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
+.pi svg{position:absolute;inset:0;width:100%;height:100%}
+.pane{display:none}.pane.on{display:block}
+.pc .nf{flex:1;min-width:0}.pc b{font:700 16px var(--f);display:block}.pc small{display:block;font-size:13px}.pr{color:var(--pk2);font-weight:700;font-size:14px}
+.hv{background:none;border:0;font-size:19px;padding:2px}.hv.on{animation:wob .5s}
+/* memos */
+.memos{display:grid;gap:18px;margin-top:16px}
+.memo{position:relative;padding:20px 12px 8px 14px;background:repeating-linear-gradient(#fffdf8 0 24px,#ffd3de 24px 25px);border:2.5px solid var(--br);border-radius:14px;box-shadow:3px 4px 0 #6b443a33;line-height:25px;font-style:italic}
+.memo:nth-child(odd){transform:rotate(-1.2deg)}.memo:nth-child(even){transform:rotate(1.2deg)}
+.memo::before{content:"🎀";position:absolute;top:-14px;left:18px;font-size:26px}
+.memo b{display:block;text-align:right;color:var(--pk2)}
+/* modal */
+.ov{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:14px;background:#6b443a88}
+.ov.on{display:flex}
+.env2{width:100%;max-width:440px;max-height:86vh;overflow:auto;background:var(--va);border:3px solid var(--br);border-radius:24px;padding:16px;position:relative;box-shadow:0 6px 0 #6b443a55;animation:pop .35s cubic-bezier(.3,1.8,.5,1)}
+@keyframes pop{from{transform:scale(.6) rotate(-4deg);opacity:0}}
+.env2 .x{position:absolute;right:10px;top:10px;width:32px;height:32px;border-radius:50%;border:2.5px solid var(--br);background:var(--pk);color:#fff;font:700 14px var(--f)}
+.env2 h3{font:italic 700 20px var(--f);color:var(--pk2);padding-right:38px;margin-bottom:8px}
+.env2 ul{list-style:none;margin:6px 0}.env2 li{margin:8px 0;padding-left:22px;position:relative;font-size:15px}.env2 li::before{content:"♡";position:absolute;left:0;color:var(--pk2)}
+.vr{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:2px dotted var(--pk);font-size:15px}
+input,textarea{width:100%;font:inherit;padding:7px 10px;margin:4px 0 8px;background:repeating-linear-gradient(#fff 0 24px,#ffe4ec 24px 25px);border:2.5px solid var(--br);border-radius:14px;color:var(--br)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140px);z-index:70;background:var(--br);color:var(--bt);padding:8px 16px;border-radius:20px;transition:transform .4s cubic-bezier(.3,1.8,.5,1);max-width:90vw;text-align:center;font-size:14px}.toast.on{transform:translate(-50%,0)}
+footer{text-align:center;margin-top:18px;font-style:italic;font-size:14px}
+
+/* Oci's Little Land — halaman tambahan mengikuti gaya kartu asli */
+.oci-menu-btn{flex:none;font-size:22px}
+.oci-screen{display:none}.oci-screen.active{display:block}
+.oci-side-shade{display:none;position:fixed;inset:0;background:#6b443a88;z-index:80}.oci-side-shade.show{display:block}
+.oci-side{position:fixed;z-index:81;left:0;top:0;bottom:0;width:min(310px,85vw);background:var(--va);border-right:4px solid var(--br);box-shadow:6px 0 0 #ff6b8b55;padding:25px 18px;transform:translateX(-105%);transition:transform .25s ease;display:flex;flex-direction:column;gap:12px}
+.oci-side.show{transform:translateX(0)}.oci-side h2{font:italic 700 25px var(--f);color:var(--pk2);margin:12px 0 18px}
+.oci-side button{padding:13px;text-align:left;border:2.5px solid var(--br);background:#ffe4ec;border-radius:18px;font-weight:700;box-shadow:3px 3px 0 #6b443a33}.oci-side button:active{transform:translateY(2px)}
+.oci-side .oci-close{align-self:flex-end;padding:4px 12px}.oci-side .oci-bottom{margin-top:auto;font-size:13px;overflow-wrap:anywhere}
+.oci-page-head{text-align:center;padding:28px 15px 0}.oci-page-head h1{font:italic 700 29px var(--f);color:var(--pk2)}.oci-page-head p{font-style:italic;margin-top:7px}
+.oci-accordion{width:100%;padding:12px;text-align:left;border:2.5px solid var(--br);border-radius:17px;background:#fff7c2;font:700 15px var(--f);margin:8px 0;box-shadow:3px 4px 0 #6b443a33}
+.oci-accordion-panel{display:none;padding:8px 5px 12px;font-size:14px;line-height:1.6}.oci-accordion-panel.show{display:block}
+.oci-loyalty{position:relative;background:#ffbdd0;border:3px solid var(--br);border-radius:24px;padding:22px 14px 17px;box-shadow:4px 5px 0 #6b443a40;text-align:center;margin-top:15px}
+.oci-loyalty:before{content:'';position:absolute;inset:7px;border:2px dashed #fffdf8;border-radius:17px;pointer-events:none}
+.oci-loyalty>*{position:relative}.oci-loyalty h2{font:italic 700 24px var(--f);color:var(--br)}.oci-loyalty p{font-size:13px;margin-top:5px}
+.oci-stamps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:23px 0 18px}
+.oci-stamp{aspect-ratio:1/1.15;background:var(--va);border:2px dashed var(--pk2);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:2px 3px 0 #6b443a30;min-width:0}
+.oci-stamp small{font-size:10px;color:var(--br)}.oci-stamp span{font-size:19px;filter:grayscale(1);opacity:.4}.oci-stamp.reward{background:#fff7c2}.oci-stamp.reward span{filter:none;opacity:1}
+.oci-progress{padding:8px;border:2px solid var(--br);border-radius:20px;background:#fff7c2;font-weight:700;font-size:14px}
+.oci-stamp-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}.oci-stamp-actions input{flex:1;min-width:140px;margin:0}.oci-stamp-actions button{flex:1}
+.oci-invoice{padding:14px;background:#fffdf8;border:2.5px solid var(--br);border-radius:17px;margin:13px 0;box-shadow:3px 4px 0 #6b443a33}.oci-invoice b{color:var(--pk2)}.oci-invoice small{display:block;margin:5px 0}.oci-invoice .row{justify-content:flex-start}
+.oci-login{position:fixed;z-index:95;inset:0;background:linear-gradient(140deg,#ffe4ec,#fffdf8 55%,#e6f4d0);display:flex;align-items:center;justify-content:center;padding:20px}.oci-login.hidden{display:none}
+.oci-login-card{width:min(410px,100%);background:var(--va);border:3px solid var(--br);border-radius:26px;padding:28px 20px;text-align:center;box-shadow:5px 7px 0 #6b443a40;outline:2px dashed var(--pk);outline-offset:-10px}.oci-login-card h1{font:italic 700 29px var(--f);color:var(--pk2)}.oci-login-card p{margin:10px 0 16px;font-size:14px}.oci-login-card input{text-align:center}
+
+
+/* Admin workspace preview: local device only, not secure admin authentication */
+.oci-admin-grid{display:grid;gap:9px}.oci-admin-field{display:block;font-size:13px;font-weight:700}.oci-admin-field input,.oci-admin-field select{width:100%;margin-top:4px}.oci-admin-field select{font:inherit;padding:9px;border:2px solid var(--br);border-radius:13px;background:#fff}.oci-admin-note{padding:10px;background:#fff7c2;border:2px dashed var(--br);border-radius:14px;font-size:13px;margin:10px 0}.oci-admin-item{border:2px solid var(--br);border-radius:15px;padding:12px;margin:10px 0;background:#fff}.oci-admin-item p{margin:4px 0;font-size:13px}.oci-admin-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}.oci-admin-actions button,.oci-admin-actions a{font-size:12px;padding:5px 9px}.oci-admin-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.oci-admin-toolbar select{font:inherit;border:2px solid var(--br);border-radius:12px;padding:6px;background:#fff}.oci-admin-pill{display:inline-block;border-radius:12px;background:#ffe4ec;padding:4px 8px;font-size:12px}
+
+/* Strawberry receipt V7 */
+.oci-invoice{background:#fff9fc;border:2px solid #ed9fbb;border-radius:23px;padding:16px;box-shadow:4px 5px 0 #edb7c980;margin:16px 0}
+.oci-invoice button.oci-receipt-open{width:100%;background:transparent;border:0;text-align:left;color:#69423e;cursor:pointer;font:inherit;padding:0}
+.oci-receipt-head{display:flex;align-items:center;gap:12px}.oci-receipt-emoji{font-size:29px;background:#ffe1ed;border-radius:50%;padding:9px}
+.oci-receipt-title{font-weight:800;color:#c94b7c;font-size:18px}.oci-receipt-hint{font-size:12px;color:#9e7889}
+.oci-receipt-status{display:inline-block;margin-top:9px;border-radius:30px;padding:5px 12px;background:#fff1bd;font-size:13px;font-weight:700}.oci-receipt-status.paid{background:#e4f3df;color:#487447}
+.oci-receipt-overlay{position:fixed;inset:0;background:#34222ba8;z-index:9999;display:none;align-items:center;justify-content:center;padding:14px;overflow:auto}
+.oci-receipt-overlay.show{display:flex}.oci-receipt-sheet{background:#ffe2ed;border:3px solid #f5abc8;border-radius:28px;width:min(100%,440px);max-height:94vh;overflow:auto;padding:17px;box-shadow:0 8px 35px #311b2960}
+.oci-receipt-paper{background:#fffefa;border-radius:21px;padding:24px 18px;color:#63434f;box-shadow:0 3px 14px #b97b9633;font-family:inherit}
+.oci-receipt-paper h2{color:#bd497a;text-align:center;margin:4px 0;font-size:27px}.oci-receipt-paper .cute{text-align:center;font-size:31px}.oci-receipt-paper .tiny{text-align:center;font-size:12px;color:#ae8297}
+.oci-receipt-line{display:flex;justify-content:space-between;gap:14px;margin:11px 0;font-size:14px}.oci-receipt-line span:last-child{text-align:right;overflow-wrap:anywhere}
+.oci-receipt-rule{border-top:2px dashed #edb9cd;margin:19px 0}.oci-receipt-total{font-weight:800;color:#ce5485;font-size:20px}
+.oci-receipt-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.oci-receipt-actions button,.oci-receipt-actions a{border:2px solid #d66c99;border-radius:30px;padding:10px 13px;background:#fff5f9;color:#ad4471;font:inherit;font-size:14px;cursor:pointer;text-decoration:none}
+@media print{body *{visibility:hidden!important}.oci-receipt-overlay,.oci-receipt-overlay *{visibility:visible!important}.oci-receipt-overlay{position:absolute;inset:0;display:block;background:white}.oci-receipt-sheet{max-height:none;box-shadow:none;border:0}.oci-receipt-actions{display:none!important}}
+
+/* V13 — hadiah delapan stamp dan tombol klaim dinamis */
+.oci-celebrate{position:fixed;inset:0;z-index:120;background:#48283dbd;display:none;align-items:center;justify-content:center;padding:18px;overflow:auto}
+.oci-celebrate.show{display:flex}
+.oci-celebrate-card{position:relative;overflow:hidden;width:min(440px,100%);max-height:90vh;overflow-y:auto;background:linear-gradient(145deg,#fffdf8,#ffe0ec);border:4px solid #6b443a;border-radius:28px;padding:26px 19px;text-align:center;box-shadow:0 12px 0 #6b443a66;animation:oci-celebrate-pop .65s cubic-bezier(.18,1.5,.5,1)}
+@keyframes oci-celebrate-pop{from{opacity:0;transform:scale(.45) rotate(-8deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.oci-celebrate-card h2{font:italic 700 29px var(--f);color:#d64d80;margin:8px 0}
+.oci-celebrate-card p{line-height:1.6;margin:10px 0;font-size:15px}
+.oci-celebrate-berries{font-size:42px;animation:oci-berries-bounce 1.2s ease-in-out infinite alternate}
+@keyframes oci-berries-bounce{to{transform:translateY(-10px) rotate(9deg)}}
+.oci-confetti{pointer-events:none;position:absolute;inset:0;overflow:hidden}
+.oci-confetti i{position:absolute;top:-15%;font-style:normal;animation:oci-confetti-fall 3.4s linear infinite;opacity:.85}
+@keyframes oci-confetti-fall{to{transform:translateY(100vh) rotate(720deg)}}
+.oci-celebrate-actions{display:flex;flex-direction:column;gap:12px;align-items:stretch;margin-top:18px}
+.oci-celebrate-actions a,.oci-celebrate-actions button{display:block;text-align:center;padding:11px;border:2px solid #6b443a;border-radius:20px;font:700 15px var(--f);text-decoration:none;color:#6b443a;background:#a8d582;cursor:pointer}
+.oci-celebrate-actions button{background:#fffdf8}
+
+/* V18: tombol info membuka popup, bukan accordion */
+.oci-info-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:17px 15px;font-family:inherit;font-weight:800;font-size:clamp(16px,3.7vw,21px);color:#604039;cursor:pointer}
+.oci-info-trigger .oci-plus{font-size:26px;color:#f08a9d;flex:none}
+.oci-info-trigger:active{transform:translateY(2px)}
+.oci-guide-modal .oci-guide-modal-content{font-size:16px;line-height:1.7;padding:4px 0 12px}
+.oci-guide-modal-content p{margin:10px 0}
+.oci-guide-modal-content ul{list-style:none;padding:0;margin:6px 0}
+.oci-guide-modal-content li{position:relative;padding-left:23px;margin:11px 0}
+.oci-guide-modal-content li::before{content:"♡";position:absolute;left:0;color:#f06d95}
+.oci-guide-modal .row{margin-top:12px}
+/* V17: accordion informasi buyer */
+.oci-info-item{margin:10px 0;border:2px solid #f2cfcb;border-radius:22px;background:#fffafc;overflow:hidden;box-shadow:2px 4px 0 #704b4220}
+.oci-info-item summary{list-style:none;cursor:pointer;padding:17px 15px;font-family:inherit;font-weight:800;font-size:clamp(16px,3.7vw,21px);color:#604039;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.oci-info-item summary::-webkit-details-marker{display:none}
+.oci-info-item summary span{font-size:26px;color:#f08a9d;transition:transform .2s;flex:none}
+.oci-info-item[open] summary span{transform:rotate(45deg)}
+.oci-info-item[open] summary{background:#fff0f5;border-bottom:1px dashed #eaa6b5}
+.oci-info-body{padding:12px 17px 17px;line-height:1.65;font-size:15px}
+.oci-info-body ul{padding-left:20px;margin:4px 0 10px}
+.oci-info-body li{margin:7px 0}
+.oci-info-body p{margin:8px 0}
+.oci-info-body .b{font-size:14px;margin-top:7px}
+.oci-info-foot{text-align:center;font-style:italic;font-size:14px;margin-top:13px}
+
+/* V19: compact info links; arrows indicate opening a modal */
+#oci-important-info{padding:18px 15px 19px}
+#oci-important-info h2{font-size:clamp(20px,5vw,27px);line-height:1.25}
+#oci-important-info>p{font-size:14px;line-height:1.45;margin-bottom:10px!important}
+#oci-important-info .oci-info-trigger{margin:7px 0!important;min-height:0!important;padding:10px 13px!important;border-radius:15px!important;box-shadow:1px 2px 0 #704b421b!important;font-size:clamp(14px,3.7vw,17px)!important;line-height:1.35!important;gap:8px!important}
+#oci-important-info .oci-info-trigger .oci-plus{font-size:17px!important;line-height:1!important;font-weight:800;transition:transform .15s}
+#oci-important-info .oci-info-trigger:hover .oci-plus{transform:translate(2px,-2px)}
+#oci-important-info .oci-info-foot{font-size:12px;line-height:1.4;margin-top:11px}
+
+/* V20: panduan gambar aplikasi dalam dropdown popup paket */
+.oci-extra-guide{grid-column:1/-1;background:#fff9fb;border:2px dashed #d89aa9;border-radius:16px;padding:12px;margin:8px 0}.oci-extra-guide p{font-size:13px;margin:5px 0}.oci-product-guide{margin:16px 0 10px;border:2px solid #b46b7d;border-radius:16px;overflow:hidden;background:#fff6f9}
+.oci-product-guide summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 12px;color:#a63b63;font-weight:700;font-size:15px;background:#ffe0eb}
+.oci-product-guide summary::-webkit-details-marker{display:none}
+.oci-product-guide summary span{transition:transform .2s}
+.oci-product-guide[open] summary span{transform:rotate(180deg)}
+.oci-product-guide-body{padding:10px 8px 14px}
+.oci-product-guide-body p{font-size:13px;line-height:1.5;margin:4px 3px 10px;color:#75535c}
+.oci-product-guide-body img{display:block;width:100%;height:auto;border-radius:10px;margin:9px 0;border:1px solid #f0d0dc}
+.oci-product-guide-body .oci-product-guide-note{margin-top:12px;font-style:italic}
+
+.oci-product-guide{padding:12px;margin:0 0 12px;background:#fff0f5;border:2px dashed #df9eae;border-radius:14px}.oci-guide-title{font-weight:800;color:#a63b63}.oci-product-guide p{margin:6px 0;font-size:13px;line-height:1.5}.oci-plan-desc{font:normal 12px/1.45 Arial,sans-serif;color:#856a72;margin-top:5px;max-width:270px}.oci-product-guide .oci-product-guide-note{font-size:11px}
+</style>
+<style>
+.oci-tier-buttons,.oci-subtiers{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.oci-tier-buttons button,.oci-subtiers button{border:2px solid #c68c9e;border-radius:22px;padding:9px 15px;background:#fff7fa;color:#754e4e;font-weight:700;cursor:pointer}.oci-tier-buttons button.on,.oci-subtiers button.on{background:#ff6b99;color:white;border-color:#925d58}.oci-pick-hint{font-size:14px;margin:8px 0}.oci-price-card{display:flex;align-items:center;justify-content:space-between;gap:10px;border:2px solid #e9b6c6;border-radius:18px;padding:12px;margin:10px 0;background:#fff7fa}.oci-price-card b,.oci-price-card strong{display:block}.oci-price-card strong{color:#e64b80;margin-top:4px}.oci-price-card .b{flex-shrink:0}.oci-info-fold{background:#ffe4ed;border-radius:16px;padding:12px 16px;margin:12px 0}.oci-info-fold summary{font-weight:bold;cursor:pointer}.oci-info-fold ul{padding-left:20px;margin:10px 0 0}.oci-info-fold li{margin:7px 0;line-height:1.45;list-style:none;position:relative}.oci-info-fold ul{padding-left:0}.oci-note-symbol{color:#df5b8b;font-weight:800;margin-right:5px}.oci-info-fold summary::marker{color:#d75487}#oci-submsg{font-size:14px;color:#8b4d65;margin:8px 0}
+ .oci-tier-buttons button,.oci-subtiers button{min-height:42px;touch-action:manipulation}.oci-price-card{min-height:70px}#oci-price-wrap{margin-top:8px} 
+/* V28: compact animated pill buttons, matching the Wajib Baca modal chips */
+#oci-tiers.oci-tier-buttons,#oci-subtiers.oci-subtiers{gap:8px 10px;margin:10px 0 14px;align-items:center}
+#oci-tiers button,#oci-subtiers button{min-height:0;padding:4px 13px;border:2.5px solid var(--br);border-radius:999px;background:var(--va);color:var(--br);font:italic 700 14px var(--f);box-shadow:none;transform:rotate(0deg) scale(1);transition:transform .28s cubic-bezier(.3,1.8,.5,1),background .2s,color .2s,border-color .2s;touch-action:manipulation}
+#oci-tiers button.on,#oci-subtiers button.on{background:var(--pk);color:#fff;border-color:var(--br);transform:rotate(-2deg) scale(1.06)}
+#oci-tiers button:active,#oci-subtiers button:active{transform:rotate(2deg) scale(.92)}
+.oci-info-fold ul{list-style:disc;padding-left:22px;margin-top:10px}
+.oci-info-fold li{list-style:disc;padding-left:0;margin:7px 0;line-height:1.45}
+.oci-info-fold li::before{content:none!important}
+.oci-info-fold li::marker{color:var(--pk2)}
+@media(max-width:380px){#oci-tiers button,#oci-subtiers button{font-size:13px;padding:4px 10px}}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<path id="st" d="M0-5L1.5-1.5 5-1 2.5 1.5 3 5 0 3-3 5-2.5 1.5-5-1-1.5-1.5Z" fill="#3aa0f0"/>
+<clipPath id="cp4"><path d="M14 44C16 8 84 8 86 44C78 36 22 36 14 44Z"/></clipPath>
+<symbol id="hd" viewBox="0 0 100 100"><g stroke="#6d5750" stroke-width="2.2" stroke-linejoin="round"><circle cx="17" cy="60" r="8" fill="#f4b9a0"/><circle cx="83" cy="60" r="8" fill="#f4b9a0"/><ellipse cx="50" cy="60" rx="33" ry="28" fill="#f9d5bb"/></g></symbol>
+<symbol id="fc" viewBox="0 0 100 100"><ellipse cx="25" cy="72" rx="7" ry="4.5" fill="#ff8fab" opacity=".7"/><ellipse cx="75" cy="72" rx="7" ry="4.5" fill="#ff8fab" opacity=".7"/><ellipse cx="36" cy="62" rx="9" ry="10" fill="#38363a"/><ellipse cx="64" cy="62" rx="9" ry="10" fill="#38363a"/><circle cx="39" cy="58" r="3" fill="#fff"/><circle cx="67" cy="58" r="3" fill="#fff"/><circle cx="33" cy="67" r="1.4" fill="#fff"/><circle cx="61" cy="67" r="1.4" fill="#fff"/><path d="M27 55l-5-3M30 51l-4-4M35 49l-2-5M42 49l1-5M73 55l5-3M70 51l4-4M65 49l2-5M58 49l-1-5" stroke="#38363a" stroke-width="1.8" stroke-linecap="round"/><path d="M47 77q3 3 6 0" stroke="#6d5750" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+<!-- 1 rambut pink panjang + bando polkadot -->
+<symbol id="c1" viewBox="0 0 100 100"><g stroke="#6d5750" stroke-width="2.2" stroke-linejoin="round"><path d="M14 56C10 14 90 14 86 56L90 94 74 94 76 62H24L26 94 10 94Z" fill="#f8b4cc"/><use href="#hd" width="100" height="100"/><path d="M20 54C20 26 80 26 80 54C70 44 30 44 20 54Z" fill="#f8b4cc"/><path d="M18 46C24 18 76 18 82 46L74 48C68 30 32 30 26 48Z" fill="#fff"/><g fill="#38363a" stroke="none"><circle cx="30" cy="36" r="2.6"/><circle cx="40" cy="29" r="2.6"/><circle cx="52" cy="26" r="2.6"/><circle cx="64" cy="29" r="2.6"/><circle cx="72" cy="37" r="2.6"/></g></g><use href="#fc" width="100" height="100"/></symbol>
+<!-- 2 cepol hitam + bonnet putih berbintik pink -->
+<symbol id="c2" viewBox="0 0 100 100"><g stroke="#6d5750" stroke-width="2.2" stroke-linejoin="round"><circle cx="17" cy="26" r="13" fill="#38363a"/><circle cx="83" cy="26" r="13" fill="#38363a"/><use href="#hd" width="100" height="100"/><path d="M20 56C20 38 80 38 80 56C68 46 32 46 20 56Z" fill="#38363a"/><path d="M22 44C26 12 74 12 78 44C68 38 32 38 22 44Z" fill="#fff"/><g fill="#fff"><circle cx="28" cy="43" r="4.5"/><circle cx="38" cy="42" r="4.5"/><circle cx="50" cy="42" r="4.5"/><circle cx="62" cy="42" r="4.5"/><circle cx="72" cy="43" r="4.5"/></g><g fill="#f6a5b8" stroke="none"><ellipse cx="38" cy="26" rx="5" ry="3"/><ellipse cx="58" cy="22" rx="5" ry="3"/><ellipse cx="66" cy="32" rx="4" ry="2.5"/><ellipse cx="44" cy="35" rx="3.5" ry="2.2"/></g></g><use href="#fc" width="100" height="100"/></symbol>
+<!-- 3 beanie bintang + kepang kuning -->
+<symbol id="c3" viewBox="0 0 100 100"><g stroke="#6d5750" stroke-width="2.2" stroke-linejoin="round"><g fill="#f7e25a"><ellipse cx="14" cy="72" rx="6" ry="4.5"/><ellipse cx="12" cy="80" rx="6" ry="4.5"/><ellipse cx="14" cy="88" rx="6" ry="4.5"/><ellipse cx="86" cy="72" rx="6" ry="4.5"/><ellipse cx="88" cy="80" rx="6" ry="4.5"/><ellipse cx="86" cy="88" rx="6" ry="4.5"/></g><use href="#hd" width="100" height="100"/><path d="M20 56C22 46 78 46 80 56C70 50 30 50 20 56Z" fill="#f7e25a"/><path d="M22 30L24 10 38 20ZM78 30L76 10 62 20Z" fill="#38363a"/><path d="M17 52C14 14 86 14 83 52C70 46 30 46 17 52Z" fill="#38363a"/></g><use href="#st" transform="translate(30 36)"/><use href="#st" transform="translate(50 28)"/><use href="#st" transform="translate(70 36)"/><use href="#st" transform="translate(40 42) scale(.8)"/><use href="#st" transform="translate(62 43) scale(.8)"/><use href="#fc" width="100" height="100"/></symbol>
+<!-- 4 bonnet gingham + kuncir hitam pita pink + stroberi -->
+<symbol id="c4" viewBox="0 0 100 100"><g stroke="#6d5750" stroke-width="2.2" stroke-linejoin="round"><path d="M16 56C14 18 86 18 84 56L88 80C86 94 74 94 74 80L76 62H24L26 80C26 94 14 94 12 80Z" fill="#38363a"/><use href="#hd" width="100" height="100"/><path d="M20 54C20 32 80 32 80 54L74 46C62 52 38 52 26 46Z" fill="#38363a"/><path d="M14 44C16 8 84 8 86 44C78 36 22 36 14 44Z" fill="#fffafa"/><g clip-path="url(#cp4)" stroke="#f9c6d6" stroke-width="2.4"><path d="M28 6v40M42 6v40M56 6v40M70 6v40M10 18h80M10 28h80M10 38h80"/></g><g fill="#fffafa"><circle cx="20" cy="42" r="4"/><circle cx="30" cy="40" r="4"/><circle cx="42" cy="39" r="4"/><circle cx="54" cy="39" r="4"/><circle cx="66" cy="40" r="4"/><circle cx="78" cy="41" r="4"/></g><path d="M68 22c7-1 10 5 8 10-3 5-9 5-11 1-2-4-1-10 3-11z" fill="#ff6b8b"/><path d="M70 20l3-5 3 4z" fill="#99cc66"/><path d="M22 28c-3-4-8 0-4 4l4 4 4-4c4-4-1-8-4-4z" fill="#ff8fab"/><path d="M12 76l-8-5v10zM88 76l8-5v10z" fill="#f8b4cc"/><rect x="26" y="49" width="14" height="3.5" rx="1.7" fill="#f7e25a" transform="rotate(-12 33 50)"/></g><use href="#fc" width="100" height="100"/></symbol>
+<!-- 5 rambut mint kepang + stroberi -->
+<symbol id="c5" viewBox="0 0 100 100"><g stroke="#6d5750" stroke-width="2.2" stroke-linejoin="round"><path d="M14 58C10 10 90 10 86 58L88 70 80 70 80 60H20L20 70 12 70Z" fill="#b8f0d2"/><g fill="#b8f0d2"><ellipse cx="13" cy="76" rx="6" ry="5"/><ellipse cx="13" cy="85" rx="6" ry="5"/><ellipse cx="87" cy="76" rx="6" ry="5"/><ellipse cx="87" cy="85" rx="6" ry="5"/></g><circle cx="13" cy="94" r="3.5" fill="#ff6b8b"/><circle cx="87" cy="94" r="3.5" fill="#ff6b8b"/><use href="#hd" width="100" height="100"/><path d="M18 56C16 18 84 18 82 56L78 46C62 52 38 52 22 46Z" fill="#b8f0d2"/><path d="M34 34v14M46 32v16M58 32v16M68 36v12" stroke-width="1.6" fill="none"/><path d="M24 22c9-3 14 4 12 11-2 6-11 8-15 2-3-5-2-11 3-13z" fill="#ff7fa0"/><path d="M26 20l5-6 4 5z" fill="#99cc66"/><g stroke="none" fill="#fff"><circle cx="26" cy="29" r="1"/><circle cx="31" cy="31" r="1"/><circle cx="28" cy="34" r="1"/></g><rect x="60" y="42" width="16" height="4" rx="2" fill="#f7e25a" transform="rotate(-18 68 44)"/><rect x="62" y="48" width="14" height="3.5" rx="1.7" fill="#c7b3ee" transform="rotate(-18 69 50)"/></g><use href="#fc" width="100" height="100"/></symbol>
+<!-- 6 rambut hitam + penutup telinga ungu -->
+<symbol id="c6" viewBox="0 0 100 100"><g stroke="#6d5750" stroke-width="2.2" stroke-linejoin="round"><path d="M14 58C10 12 90 12 86 58L90 92 70 92 76 60H24L30 92 10 92Z" fill="#2f2e31"/><use href="#hd" width="100" height="100"/><path d="M18 56C16 18 84 18 82 56L78 42C60 52 40 52 22 42Z" fill="#2f2e31"/><path d="M12 58C10 6 90 6 88 58" fill="none" stroke="#c7b3ee" stroke-width="6"/><circle cx="13" cy="62" r="11" fill="#cdbaf0"/><circle cx="87" cy="62" r="11" fill="#cdbaf0"/><g fill="#fff" stroke-width="1.4"><circle cx="9" cy="58" r="3"/><circle cx="17" cy="66" r="3"/><circle cx="83" cy="58" r="3"/><circle cx="91" cy="66" r="3"/></g><path d="M20 72Q28 98 44 94" fill="none" stroke="#9b8bc9" stroke-width="1.8"/></g><use href="#fc" width="100" height="100"/></symbol>
+</defs></svg>
+
+<div class="app">
+  <div class="nav">
+    <button class="ib oci-menu-btn" id="oci-menu-open" aria-label="Buka menu">☰</button>
+    <span class="logo">oci’s little land ໒꒱</span>
+    <div class="ic">
+      <button class="ib" id="snd" aria-label="Suara">🔊</button>
+      <button class="ib" id="bell" aria-label="Notifikasi">🐻</button>
+      <button class="ib" id="wl" aria-label="Wishlist">🎀<span class="bd" id="wc">0</span></button>
+    </div>
+    <div class="mp"><div class="oci-cassette" id="oci-cassette" aria-hidden="true"><span class="oci-reels">✿</span></div><div class="mt"><span id="mt">♪ memuat lagu…</span></div><button class="mb" id="pv" aria-label="Sebelumnya">⏮</button><button class="mb" id="pp" aria-label="Putar/Jeda">▶</button><button class="mb" id="nx" aria-label="Berikutnya">⏭</button></div>
+  </div>
+
+  <main id="oci-home" class="oci-screen active">
+  <section class="card hero" style="margin-top:36px">
+    <span class="tag">OCI’S PICNIC BASKET</span><span class="rib">READY TO SERVE!</span>
+    <div class="kids">
+      <svg viewBox="0 0 100 100"><use href="#c1"/></svg><svg viewBox="0 0 100 100"><use href="#c2"/></svg><svg viewBox="0 0 100 100"><use href="#c3"/></svg>
+      <svg viewBox="0 0 100 100"><use href="#c4"/></svg><svg viewBox="0 0 100 100"><use href="#c5"/></svg><svg viewBox="0 0 100 100"><use href="#c6"/></svg>
+    </div>
+    <small>Welcome to</small>
+    <div data-px="Oci’s Little Corner!" data-s="22">Oci’s Little Corner!</div>
+    <p style="font-style:italic">Sweet digital treats &amp; premium apps for your daily happiness 🍎</p>
+  </section>
+
+  <section class="card env">
+    <div class="in">
+      <div class="pf">
+        <div class="av"><div id="profile-avatar" class="ld"><svg viewBox="0 0 100 100"><use href="#c5"/></svg></div></div>
+        <div><div id="profile-name" class="sk">Oci 🍓</div><div id="profile-handle">@lfabubu</div></div>
+      </div>
+      <div id="profile-bio" class="sk">lagi ngambil bio dari Twitter…</div>
+      <div class="st"><div><b>40+</b>Goodies</div><div><b id="followers-count" class="sk">…</b>Twitter Folls</div><div><b>100%</b>Sweet &amp; Safe</div></div>
+      <span class="open" id="oci-store-hours"><i>●</i> <span id="oci-store-hours-label">Memeriksa jam buka toko… ♡</span></span>
+      <div class="row" style="margin-top:10px">
+        <a class="b" href="https://t.me/oSprinkles" target="_blank" rel="noopener">💌 1.5K+ Testimonials ↗</a>
+      </div>
+      <div class="row">
+        <a class="b" href="https://x.com/lfabubu" target="_blank" rel="noopener">DM Twitter (@lfabubu) ↗</a>
+        <a class="b g" id="wa" href="#" target="_blank" rel="noopener">Chat WhatsApp Oci ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="card note">
+    <span class="tag" style="background:var(--mt)">NOTE FROM OCI</span>
+    <p style="margin-top:6px">Hi my beloved folks! I’m Oci, and I’m so happy you stopped by my little corner ♡ Pick your favorite app, send your payment proof, and I’ll get it ready for you with all my heart. Got any questions? Just chat me, okay~ 🍓</p>
+    <div class="row"><button class="b y" data-open="m-tnc">Sebelum Membeli Wajib Baca [📜]</button></div>
+  </section>
+
+<section aria-labelledby="oci-info-heading" class="card oci-info" id="oci-important-info">
+<span class="tag" style="background:var(--mt)">📌 IMPORTANT CORNER</span>
+<h2 id="oci-info-heading" style="margin:12px 0 4px;text-align:center">Little Guide for Sweet Buyers ♡</h2>
+<p style="text-align:center;margin:0 0 14px">Pencet setiap judul buat baca info penting sebelum order, yaa 🍓</p>
+
+<button class="oci-info-item oci-info-trigger" data-open="oci-info-modal-1" type="button"><span>👤 Terkait Akun</span><span class="oci-plus" aria-hidden="true">↗</span></button>
+<button class="oci-info-item oci-info-trigger" data-open="oci-info-modal-2" type="button"><span>❓ QnA untuk Buyer</span><span class="oci-plus" aria-hidden="true">↗</span></button>
+<button class="oci-info-item oci-info-trigger" data-open="oci-info-modal-3" type="button"><span>📖 Istilah Aplikasi</span><span class="oci-plus" aria-hidden="true">↗</span></button>
+<button class="oci-info-item oci-info-trigger" data-open="oci-info-modal-4" type="button"><span>🛡️ Garansi &amp; Bantuan</span><span class="oci-plus" aria-hidden="true">↗</span></button>
+<button class="oci-info-item oci-info-trigger" data-open="oci-info-modal-5" type="button"><span>🎭 Istilah &amp; Tutor Login</span><span class="oci-plus" aria-hidden="true">↗</span></button>
+<div class="oci-info-foot">🍓 Ada yang belum jelas? Chat Oci sebelum checkout, yaa ♡</div>
+</section>
+
+  <section class="card" id="goods">
+    <span class="tag">GOODIES BASKET</span>
+    <div data-px="A Basket Full of Goodies" data-s="20">A Basket Full of Goodies</div>
+    <p class="sub">Pilih paket langganan favoritmu! 🧺</p>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="card" id="testi">
+    <span class="tag">LITTLE LOVE NOTES</span>
+    <div data-px="Sweet Stories from My Folks" data-s="20">Sweet Stories from My Folks</div>
+    <p class="sub">Catatan manis dari mereka yang udah jajan di toko Oci 💌</p>
+    <div class="row" style="margin-top:0"><button class="b" data-open="m-rev">Tulis Surat Ulasan ✎</button></div>
+    <div class="memos" id="memos"></div>
+  </section>
+  </main>
+  <section class="oci-screen" id="oci-orders">
+    <div class="oci-page-head"><h1>Riwayat Invoice 🧾</h1><p>Struk manis pesananmu, tersinkron dengan Oci ♡</p></div>
+    <section class="card"><span class="tag">PAYMENT DIARY</span><div data-px="My Sweet Orders" data-s="22">My Sweet Orders</div>
+      <p class="sub">Ketuk struk untuk melihat rincian dan status pembayaran ♡</p>
+      <div id="oci-order-list"></div>
+    </section>
+  </section>
+  <section class="oci-screen" id="oci-rewards">
+    <div class="oci-page-head"><h1>Loyalty Card 🍓</h1><p>Sweet little treats for Oci's besties ♡</p></div>
+    <section class="card"><span class="tag">STRAWBERRY REWARDS</span>
+      <button class="oci-accordion" data-oci-accordion="oci-rules">♡ Aturan Loyalty Card 🍓 <span style="float:right">⌄</span></button>
+      <div class="oci-accordion-panel" id="oci-rules"><p>🍓 Minimal pembelian Rp20.000 mendapat 1 stamp (tidak berlaku kelipatan).</p><p>🎀 Maksimal 1 stamp per order.</p><p>💌 Stamp tidak dapat diuangkan.</p><p>🎁 Kumpulkan 8 stamp untuk 1 aplikasi premium gratis, boleh request maksimal Rp30.000.</p><p>📸 Stamp hanya diberikan setelah mengirim bukti berhasil login (garansi aktif) dan pembayaran diperiksa Oci.</p><p>📱 Berlaku untuk nomor WhatsApp yang sama.</p><p>🗓️ Berlaku 3 bulan sejak stamp pertama; jika order lagi sebelum kedaluwarsa, masa berlaku diperpanjang 3 bulan.</p></div>
+      <div class="oci-loyalty"><div style="font-size:24px">🎀 🍓 💌 🍎</div><h2>Little Loyalty Card</h2><p>Oci's Little Land · sweet rewards diary</p>
+        <div class="oci-stamps"><div class="oci-stamp"><small>01</small><span>🍓</span></div><div class="oci-stamp"><small>02</small><span>🍎</span></div><div class="oci-stamp"><small>03</small><span>🎀</span></div><div class="oci-stamp"><small>04</small><span>🍓</span></div><div class="oci-stamp"><small>05</small><span>🍎</span></div><div class="oci-stamp"><small>06</small><span>🍓</span></div><div class="oci-stamp"><small>07</small><span>🎀</span></div><div class="oci-stamp"><small>08</small><span>🎁</span></div></div><div class="oci-progress">🍓 0 / 8 stamp · memuat masa berlaku ♡</div><p>made with strawberries & love ♡</p>
+      </div>
+      <div class="oci-stamp-actions"><input id="oci-stamp-code" maxlength="40" placeholder="Masukkan kode stamp"><button class="b" id="oci-stamp-submit">Tempel Stamp 🍓</button></div>
+      <p style="font-size:13px;margin-top:9px">Masukkan kode rahasia dari Oci setelah pembayaran dan bukti login dikonfirmasi. ♡</p>
+      <button class="oci-accordion" data-oci-accordion="oci-gifts">🎁 Hadiah <span style="float:right">⌄</span></button>
+      <div class="oci-accordion-panel" id="oci-gifts">🎁 Setelah 8 stamp terkumpul, dapat 1 aplikasi premium gratis pilihanmu dengan harga maksimal Rp30.000. Penukaran diverifikasi Oci. ♡</div>
+      <div class="row"><a class="b g" id="oci-reward-chat" target="_blank" rel="noopener">Tanya Stamp ke Oci ↗</a></div>
+    </section>
+  </section>
+  <section class="oci-screen" id="oci-admin">
+    <div class="oci-page-head"><h1>Admin Tools 🔐</h1><p>Oci's little order notebook ♡</p></div>
+    <section class="card" id="oci-admin-auth"><span class="tag">ADMIN LOGIN 🔐</span><h3 style="margin-top:8px">Masuk sebagai Oci ♡</h3><p style="font-size:13px">Hanya akun admin Firebase yang bisa mengelola rekap online. Buka lewat HTTPS GitHub Pages.</p><form id="oci-auth-form"><label>Email admin<input type="email" id="oci-auth-email" autocomplete="username" required></label><label>Password<input type="password" id="oci-auth-password" autocomplete="current-password" required></label><button class="b" type="submit">Masuk Admin ♡</button></form><p id="oci-auth-status" style="font-size:13px;margin-top:10px"></p><button class="b v" id="oci-auth-logout" style="display:none" type="button">Keluar dari Admin</button></section>
+     <section class="card oci-admin-private" style="display:none"><span class="tag">ADMIN FIREBASE</span>
+      <div class="oci-admin-note"><b>☁️ Rekap dan kode stamp admin tersimpan di Firebase.</b> Catatan yang Oci buat atau verifikasi di sini tersinkron ke perangkat admin lain setelah login. <b>Draft buyer masih disimpan lokal</b>; status invoice buyer diperbarui melalui Firebase setelah order diambil admin. Untuk itu perlu alur order aman tambahan. Jangan menganggap tombol lunas sebagai bukti transfer.</div>
+      <h3>🧾 Invoice Masuk — Perlu Dicek</h3>
+      <p style="font-size:13px;margin:6px 0">Draft order dari browser ini bisa diambil ke rekap Firebase. Draft dari HP buyer lain belum masuk otomatis; pembayaran wajib dicek Oci.</p>
+      <div id="oci-ad-inbox"></div>
+      <h3 style="margin-top:22px">🍓 Kelola Loyalty Stamp</h3>
+      <p style="font-size:13px">Pilih order, periksa pembayaran dan bukti login, lalu kelola catatan stamp. Kode stamp tersedia setelah pembayaran lunas, bukti login diterima, harga minimal Rp20.000, dan nomor WA valid. Penukaran buyer tersedia setelah Rules V10 dipublikasikan.</p>
+      <div class="oci-admin-toolbar"><label for="oci-ad-stamp-filter">Tampilkan:</label><select id="oci-ad-stamp-filter"><option value="all">Semua order</option><option value="eligible">Layak diberi stamp</option><option value="issued">Kode dibuat</option><option value="waiting">Menunggu syarat</option></select></div>
+      <div id="oci-ad-stamps"></div>
+      <h3 style="margin-top:22px">🎁 Konfirmasi Hadiah Loyalty</h3>
+      <div class="oci-admin-note">Hanya untuk admin: setelah hadiah benar-benar diberikan, masukkan nomor WhatsApp buyer yang kartunya sudah 8/8. Reset tidak bisa dibatalkan. Jangan reset sebelum hadiah diserahkan. ♡</div>
+      <label class="oci-admin-field">Nomor WhatsApp penerima hadiah
+        <input id="oci-reward-reset-phone" type="tel" inputmode="tel" placeholder="08xxxxxxxxxx">
+      </label>
+      <button class="b g" type="button" id="oci-reward-reset-btn">🎁 Hadiah Sudah Diberikan — Reset Stamp</button>
+      <p id="oci-reward-reset-status" style="font-size:13px;margin-top:9px" aria-live="polite"></p>
+      <h3 style="margin-top:22px">📅 Rekap Order &amp; Reminder</h3>
+      <p style="font-size:13px;margin:6px 0">Form tambahan manual ada di bawah jika ada order dari WhatsApp yang tidak tercatat lewat website. Tanggal berakhir tetap diisi Oci.</p>
+      <details style="margin:12px 0"><summary class="oci-accordion" style="cursor:pointer">➕ Tambah order manual (opsional) ⌄</summary><form id="oci-admin-form" class="oci-admin-grid">
+        <label class="oci-admin-field">Nama buyer<input id="oci-ad-name" maxlength="50" required placeholder="Nama panggilan"></label>
+        <label class="oci-admin-field">Nomor WhatsApp buyer<input id="oci-ad-phone" type="tel" required placeholder="08xxxxxxxxxx"></label>
+        <label class="oci-admin-field">Aplikasi &amp; paket<input id="oci-ad-product" maxlength="120" required placeholder="Netflix · 1 bulan"></label>
+        <label class="oci-admin-field">Total order (Rp)<input id="oci-ad-price" type="number" min="0" step="1000" required placeholder="20000"></label>
+        <label class="oci-admin-field">Tanggal order<input id="oci-ad-date" type="date" required></label>
+        <label class="oci-admin-field">Tanggal akun berakhir<input id="oci-ad-expiry" type="date" required></label>
+        <label class="oci-admin-field">Status pembayaran<select id="oci-ad-status"><option value="pending">Belum diverifikasi</option><option value="paid">Sudah dicek &amp; lunas</option></select></label>
+        <label class="oci-admin-field"><input id="oci-ad-proof" type="checkbox" style="width:auto"> Bukti berhasil login sudah diterima (garansi aktif)</label>
+        <button class="b" type="submit">Simpan Catatan Order ♡</button>
+      </form></details>
+      <div class="oci-admin-note">🍓 Aturan stamp: minimum Rp20.000, maksimal 1 stamp per order, dan hanya setelah lunas + bukti login. Kode unik dapat dibuat oleh admin setelah syarat terpenuhi. Kode baru disimpan di stampCodes setelah dibuat admin; stamp bertambah hanya ketika buyer menukarkannya.</div>
+      <div class="oci-admin-toolbar"><label for="oci-ad-month">Bulan:</label><select id="oci-ad-month"></select><button class="b v" id="oci-ad-export" type="button">Unduh CSV</button></div>
+      <div id="oci-ad-summary" style="margin:10px 0;font-size:13px"></div><div id="oci-ad-list"></div>
+      <h3 style="margin-top:18px">🔔 Pengingat Perpanjangan</h3>
+      <p style="font-size:13px">Pengingat H-3 dan H-1 tampil saat halaman Admin Tools dibuka. Notifikasi push ke Android/iPhone saat website tertutup membutuhkan backend terjadwal dan izin notifikasi, jadi <b>belum aktif</b>.</p>
+      <div id="oci-ad-reminders"></div>
+    </section>
+  </section>
+  <footer>made with 🍎 &amp; crayons · mochi’s little land ♡</footer>
+</div>
+
+<div class="oci-side-shade" id="oci-menu-shade"></div>
+<aside class="oci-side" id="oci-menu" aria-label="Menu Oci's Little Land"><button class="oci-close" id="oci-menu-close">✕</button><h2>MENU 🍓🎀</h2><button data-oci-page="oci-home">🏠 Beranda</button><button data-oci-page="oci-orders">🧾 Riwayat Invoice</button><button data-oci-page="oci-rewards">💌 Loyalty Card</button><button data-oci-page="oci-admin">🔐 Admin Tools</button><div class="oci-bottom"><p>oci's little land ♡</p><p id="oci-menu-phone"></p><button id="oci-switch-phone" style="margin-top:12px">Ganti nomor HP</button></div></aside>
+<div class="oci-login" id="oci-login"><form class="oci-login-card" id="oci-login-form"><div style="font-size:35px">🍓🎀🍎</div><h1>Welcome to Oci's Little Land!</h1><p>Tulis nomor HP kamu untuk masuk ke little corner ini ♡<br><small>Tanpa OTP · hanya disimpan di perangkat ini.</small></p><input id="oci-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx" required maxlength="18"><button class="b" type="submit">Masuk ke Little Land ♡</button><p style="font-size:12px">Nomor ini bukan verifikasi identitas dan tidak membuka data pesanan pribadi dari database.</p></form></div>
+<div class="ov" id="oci-info-modal-1" role="dialog" aria-modal="true" aria-label="👤 Terkait Akun"><div class="env2 oci-guide-modal">
+<button class="x" data-close aria-label="Tutup">✕</button><h3>👤 Terkait Akun</h3>
+<div class="oci-guide-modal-content"><ul><li>Perhatikan apakah produk menggunakan akun dari seller atau akun pribadi buyer.</li><li>Jangan mengganti email, password, atau pengaturan akun tanpa izin apabila paket memiliki batasan tersebut.</li><li>Simpan detail pesanan dan ikuti instruksi login yang dikirim Oci.</li><li>Kalau login bermasalah, hubungi Oci terlebih dahulu sebelum mencoba perubahan akun.</li></ul></div>
+<div class="row"><button class="b y" data-close>Sudah kubaca, Oci! ♡</button></div>
+</div></div>
+<div class="ov" id="oci-info-modal-2" role="dialog" aria-modal="true" aria-label="❓ QnA untuk Buyer"><div class="env2 oci-guide-modal">
+<button class="x" data-close aria-label="Tutup">✕</button><h3>❓ QnA untuk Buyer</h3>
+<div class="oci-guide-modal-content"><p><strong>Kapan order diproses?</strong> Setelah pembayaran masuk dan detail pesanan sudah lengkap.</p><p><strong>Kalau salah mengisi ID game?</strong> Periksa lagi username, User ID, dan Zone ID sebelum bayar. Kesalahan input bisa membuat pesanan tidak dapat diperbaiki.</p><p><strong>Kalau aplikasi atau akun bermasalah?</strong> Kirim nomor pesanan, bukti pembayaran, dan tangkapan layar kendala ke Oci.</p><p><strong>Bisa tanya sebelum beli?</strong> Bisa banget! Hubungi Oci lewat WhatsApp di bagian profil ♡</p></div>
+<div class="row"><button class="b y" data-close>Sudah kubaca, Oci! ♡</button></div>
+</div></div>
+<div class="ov" id="oci-info-modal-3" role="dialog" aria-modal="true" aria-label="📖 Istilah Aplikasi"><div class="env2 oci-guide-modal">
+<button class="x" data-close aria-label="Tutup">✕</button><h3>📖 Istilah Aplikasi</h3>
+<div class="oci-guide-modal-content"><p><strong>Private:</strong> paket dengan akses yang ditujukan untuk satu pengguna, mengikuti detail produk.</p><p><strong>Sharing:</strong> akses akun atau layanan yang dipakai bersama sesuai aturan paket.</p><p><strong>Renew:</strong> memperpanjang masa berlangganan.</p><p><strong>Garansi:</strong> bantuan penanganan kendala sesuai syarat paket yang dibeli.</p><p><em>Nama dan cakupan paket bisa berbeda untuk tiap aplikasi; selalu cek deskripsi produk sebelum order.</em></p></div>
+<div class="row"><button class="b y" data-close>Sudah kubaca, Oci! ♡</button></div>
+</div></div>
+<div class="ov" id="oci-info-modal-4" role="dialog" aria-modal="true" aria-label="🛡️ Garansi & Bantuan"><div class="env2 oci-guide-modal">
+<button class="x" data-close aria-label="Tutup">✕</button><h3>🛡️ Garansi & Bantuan</h3>
+<div class="oci-guide-modal-content"><ul><li>Untuk kendala akun, kirim bukti login atau tangkapan layar masalah beserta detail pesanan.</li><li>Ikuti instruksi penggunaan akun agar hak garansi tidak terganggu.</li><li>Ketentuan pada website saat ini meminta bukti login dalam 24 jam dan menyebut estimasi penanganan masalah 1–3 hari.</li><li>Cakupan garansi bergantung pada produk dan kondisi masalah; tanyakan ke Oci sebelum membeli jika ragu.</li></ul><p><strong>Catatan:</strong> jangan kirim password atau kode OTP melalui kolom testimoni publik.</p></div>
+<div class="row"><button class="b y" data-close>Sudah kubaca, Oci! ♡</button></div>
+</div></div>
+<div class="ov" id="oci-info-modal-5" role="dialog" aria-modal="true" aria-label="🎭 Istilah & Tutor Login"><div class="env2 oci-guide-modal">
+<button class="x" data-close aria-label="Tutup">✕</button><h3>🎭 Istilah & Tutor Login</h3>
+<div class="oci-guide-modal-content"><p><strong>Langkah umum:</strong> baca instruksi paket → gunakan metode login yang ditentukan → cek akses → simpan bukti login bila diperlukan.</p><p>Setiap aplikasi bisa punya langkah berbeda. Untuk tutorial spesifik, minta panduan sesuai aplikasi yang dibeli lewat chat Oci.</p></div>
+<div class="row"><button class="b y" data-close>Sudah kubaca, Oci! ♡</button></div>
+</div></div>
+<div class="ov" id="m-tnc"><div class="env2">
+  <button class="x" data-close aria-label="Tutup">✕</button>
+  <h3>📜 Sebelum Membeli Wajib Baca</h3>
+  <div class="row" style="justify-content:flex-start;margin:0 0 6px"><button class="chip on" data-tab="t1">Apps Premium</button><button class="chip" data-tab="t2">Robux via Send</button><button class="chip" data-tab="t3">Mobile Legends</button></div>
+  <ul class="pane on" id="t1">
+    <li>Yuk budayakan membaca dan pahami dulu sistem akunnya sebelum membeli, ya!</li>
+    <li>Orderan kamu akan langsung diproses begitu pembayaran sudah masuk.</li>
+    <li>Mohon bersabar dan tidak terburu-buru, admin pasti proses secepat mungkin di sela kesibukan.</li>
+    <li>Jangan lupa kirim bukti login dalam 24 jam supaya garansimu tetap aman.</li>
+    <li>Sisa masa aktif 1–5 hari pada akun tetap terhitung sebulan penuh, ya.</li>
+    <li>Mari saling menghargai dan berkomunikasi dengan sopan agar transaksi nyaman.</li>
+    <li>Hindari mengganti email akun yang ada keterangan dendanya demi keamanan bersama.</li>
+    <li>Kalau ada akun yang bermasalah, kirim format garansi dan tunggu proses perbaikan 1–3 hari yaa. Ingat ini blackmarket, meskipun kamu membeli tapi kamu membeli dengan harga yg lebih murah daripada di toko aslinya, jadi harap bersabar</li>
+    <li>Kalau merasa belum cocok dengan ketentuan ini, tidak apa-apa untuk batal order dulu.</li>
+  </ul>
+  <ul class="pane" id="t2"><li>Pastikan username Roblox sudah benar sebelum membayar ya.</li><li>Pengiriman via Send, diproses setelah pembayaran masuk.</li><li>Mohon bersabar, admin pasti proses secepat mungkin di sela kesibukan.</li><li>Salah input data bukan tanggung jawab toko, ya.</li></ul>
+  <ul class="pane" id="t3"><li>Isi User ID &amp; Zone ID dengan teliti sebelum membayar.</li><li>Orderan akan langsung diproses begitu pembayaran sudah masuk.</li><li>Mohon bersabar, admin pasti proses secepat mungkin.</li><li>Pesanan yang sudah diproses tidak bisa dibatalkan, ya.</li></ul>
+  <div class="row"><button class="b" data-close>Siap, paham! ♡</button></div>
+</div></div>
+
+<div class="ov" id="m-rev"><div class="env2">
+  <button class="x" data-close aria-label="Tutup">✕</button>
+  <h3>📖 Dear Diary Oci…</h3>
+  <label>Nama / panggilan<input id="rn" maxlength="24" placeholder="misal: Nisa"></label>
+  <label>Testimu<textarea id="rt" rows="4" maxlength="160" placeholder="ceritain pengalaman jajan di sini ya ♡"></textarea></label>
+  <div class="row"><button class="b" id="rs">Kirim Testimoni →</button><button class="b v" data-close>Batal</button></div>
+</div></div>
+
+<div class="ov" id="m-pk"><div class="env2">
+  <button class="x" data-close aria-label="Tutup">✕</button>
+  <h3 id="pt">Pilih Paket</h3><div id="pb"></div><div id="om"></div>
+  <p style="margin-top:8px;font-size:14px;font-style:italic">Tombol order akan membuka WhatsApp Oci dengan pesan yang sudah terisi ♡</p>
+</div></div>
+<div class="toast" id="toast"></div>
+<div class="oci-celebrate" id="oci-celebrate" role="dialog" aria-modal="true" aria-labelledby="oci-celebrate-title">
+  <div class="oci-celebrate-card">
+    <div class="oci-confetti" id="oci-confetti" aria-hidden="true"></div>
+    <div class="oci-celebrate-berries">🍓🎀🎁🍓</div>
+    <h2 id="oci-celebrate-title">Selamat! ♡</h2>
+    <p><b>Kamu sudah berhasil mengumpulkan 8 stempel dan menjadi buyer langganan kesayanganku ♡</b></p>
+    <p>Sekarang kamu bisa menukarkan 8 stempel tadi menjadi aplikasi premium/topup games yang kamu mau, maksimal Rp30.000!</p>
+    <p>Terimakasih sudah sering order :D<br>Jangan lupa repeat order lagi! 🍓</p>
+    <p style="font-size:12px">Stamp akan direset setelah Oci mengonfirmasi hadiah sudah diberikan, supaya hak klaimmu tetap aman.</p>
+    <div class="oci-celebrate-actions">
+      <a id="oci-celebrate-wa" target="_blank" rel="noopener">🎁 Klaim hadiah via WhatsApp Oci</a>
+      <button id="oci-celebrate-close" type="button">Nanti dulu, simpan hadiahnya ♡</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)},$$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+var WA="62881012310046";
+/* playlist: taruh file mp3 di folder audio/ (satu folder dengan file HTML ini) */
+var PL=[
+ {t:"Cherish (My Love)",a:"ILLIT",src:"audio/iLLiT - Cherish (My Love).mp3"},
+ {t:"Strawberry Picnic",a:"Oci’s Music Box",notes:[523,659,784,1047,988,784,659,784,880,1047,784,659,587,698,784,523]},
+ {t:"Pink Ribbon Waltz",a:"Oci’s Music Box",notes:[659,784,988,880,784,698,659,587,659,880,1047,988,880,784,659,523]},
+ {t:"Moonlight Letter",a:"Oci’s Music Box",notes:[523,587,659,784,698,659,587,523,440,523,659,698,659,587,523,392]}
+];
+var CATS=[["Streaming","#ffe4ec"],["Music","#e6f4d0"],["Editing","#fff7c2"],["Education","#e0f0fb"],["Others","#ffd9e3"],["Games","#e6f4d0"]];
+var LC={"Netflix":"#e50914","Disney+ Hotstar":"#113ccf","Vidio":"#ee3524","YouTube Premium":"#ff0000","Amazon Prime Video":"#00a8e1","HBO Max":"#5822b4","Viu":"#f5a623","WeTV":"#ff6a00","iQIYI":"#00be06","Viki Rakuten":"#0da9e5","Bstation / Bilibili":"#fb7299","Crunchyroll":"#f47521","Apple TV+":"#1d1d1f","Loklok":"#ff3b5c","Catchplay":"#e6007e","Spotify":"#1db954","Apple Music":"#fa2d48","Resso / TikTok Music":"#ff4d4d","Tidal":"#222","Canva":"#00c4cc","CapCut":"#222","Picsart Pro":"#c209c1","Ibis Paint":"#f04d7b","Alight Motion":"#6a5acd","VN Pro":"#444","VSCO":"#222","Lightroom":"#31a8ff","Remini":"#6c4cff","Procreate":"#2b2b2b","InShot":"#ff4e82","Photoroom":"#3b6bff","ChatGPT":"#10a37f","Grammarly":"#15c39a","QuillBot":"#4caf50","Scribd / Everand":"#1a7bba","Wattpad":"#ff500a","DeepL + Write Pro":"#0f2b46","CamScanner":"#1c75bc","Mathway":"#ff7a00","Brainly+":"#4f84ff","Quizlet+":"#4257b2","iLovePDF":"#e5322d","GoodNotes":"#2db2a2","Microsoft 365":"#d83b01","Microsoft Copilot":"#7a5af8","iCloud":"#3d8bfd","Line Coin":"#06c755","Get Contact":"#1e88e5","Apple Arcade":"#ff3b30","Muslim Pro + Qalbox":"#1b7f5c","Robux":"#e2231a","Mobile Legends":"#1b3a6b","Games Top-Up / Diamonds":"#ff8fab"};
+/* logo aplikasi (SVG sederhana). Format: nama:[warna tile, isi svg] */
+var T=function(s,fs,c,y,w){return `<text x='32' y='${y}' font-size='${fs}' fill='${c}' text-anchor='middle' font-weight='800' font-family='Arial Black,Arial,sans-serif'${w?` textLength='${w}' lengthAdjust='spacingAndGlyphs'`:''}>${s}</text>`};
+var LOGOS={
+"Netflix":["#111",`<rect x='20' y='12' width='8' height='40' fill='#b1060f'/><rect x='36' y='12' width='8' height='40' fill='#b1060f'/><path d='M20 12h8l16 40h-8z' fill='#e50914'/>`],
+"Disney+ Hotstar":["#113ccf",T('Disney+',15,'#fff',30,50)+T('hotstar',11,'#9fd0ff',44,40)],
+"Vidio":["#ee3524",T('vidio',20,'#fff',38,48)],
+"YouTube Premium":["#fff",`<rect x='9' y='17' width='46' height='30' rx='9' fill='#f00'/><path d='M27 24v16l14-8z' fill='#fff'/>`],
+"Amazon Prime Video":["#00a8e1",T('prime',17,'#fff',29,46)+T('video',13,'#fff',43,34)+`<path d='M16 49q16 7 32 0' stroke='#ff9900' stroke-width='3' fill='none' stroke-linecap='round'/>`],
+"HBO Max":["#5822b4",T('HBO',14,'#fff',28,34)+T('max',20,'#fff',47,44)],
+"Viu":["#ffc81a",T('viu',24,'#111',40,40)],
+"WeTV":["#ff6a00",T('WeTV',19,'#fff',38,50)],
+"iQIYI":["#00be06",T('iQIYI',17,'#fff',37,52)],
+"Viki Rakuten":["#0da9e5",T('viki',22,'#fff',39,40)],
+"Bstation / Bilibili":["#fb7299",`<rect x='12' y='22' width='40' height='28' rx='9' fill='none' stroke='#fff' stroke-width='4'/><path d='M22 12l7 9M42 12l-7 9M22 34l6 3M42 34l-6 3' stroke='#fff' stroke-width='4' stroke-linecap='round'/>`],
+"Crunchyroll":["#f47521",`<circle cx='32' cy='32' r='20' fill='#fff'/><circle cx='36' cy='32' r='11' fill='#f47521'/>`],
+"Apple TV+":["#000",T('tv+',24,'#fff',41,38)],
+"Loklok":["#ff3b5c",T('Lok',17,'#fff',29,40)+T('lok',17,'#fff',47,40)],
+"Catchplay":["#e6007e",T('catch',15,'#fff',29,44)+T('play',15,'#fff',45,36)],
+"Spotify":["#191414",`<circle cx='32' cy='32' r='23' fill='#1db954'/><g stroke='#191414' stroke-width='4' fill='none' stroke-linecap='round'><path d='M18 25q15-5 29 3'/><path d='M20 33q12-4 24 2'/><path d='M22 41q9-3 18 1'/></g>`],
+"Apple Music":["#fa2d48",`<path d='M26 44V21l20-5v23' stroke='#fff' stroke-width='4' fill='none' stroke-linejoin='round'/><circle cx='21' cy='44' r='6' fill='#fff'/><circle cx='41' cy='39' r='6' fill='#fff'/>`],
+"Tidal":["#000",`<g fill='#fff'><path d='M10 24l7-7 7 7-7 7zM24 24l7-7 7 7-7 7zM38 24l7-7 7 7-7 7zM24 38l7-7 7 7-7 7z'/></g>`],
+"Canva":["#00c4cc",T('Canva',19,'#fff',39,50)],
+"CapCut":["#000",`<path d='M16 22l22 16M16 42l22-16M44 20v24' stroke='#fff' stroke-width='5' stroke-linecap='round'/>`],
+"Picsart Pro":["#c209c1",T('P',34,'#fff',44,22)],
+"Lightroom":["#001e36",T('Lr',30,'#31a8ff',42,34)],
+"ChatGPT":["#10a37f",`<g fill='none' stroke='#fff' stroke-width='3.6'><rect x='22' y='12' width='20' height='40' rx='10'/><rect x='22' y='12' width='20' height='40' rx='10' transform='rotate(60 32 32)'/><rect x='22' y='12' width='20' height='40' rx='10' transform='rotate(120 32 32)'/></g>`],
+"Grammarly":["#15c39a",`<circle cx='32' cy='32' r='19' fill='#fff'/>`+T('G',24,'#15c39a',41,16)],
+"Microsoft 365":["#fff",`<path d='M14 14h17v17H14z' fill='#f25022'/><path d='M33 14h17v17H33z' fill='#7fba00'/><path d='M14 33h17v17H14z' fill='#00a4ef'/><path d='M33 33h17v17H33z' fill='#ffb900'/>`],
+"iCloud":["#3d8bfd",`<path d='M20 46a9 9 0 0 1 0-18 12 12 0 0 1 23 3 8 8 0 0 1-1 15z' fill='#fff'/>`],
+"Line Coin":["#06c755",`<rect x='10' y='12' width='44' height='34' rx='16' fill='#fff'/><path d='M24 44l-4 8 12-8z' fill='#fff'/>`+T('LINE',13,'#06c755',34,30)],
+"Robux":["#00a2ff",`<path d='M32 10l19 11v22L32 54 13 43V21z' fill='#fff'/><path d='M32 20l10 6v12l-10 6-10-6V26z' fill='#00a2ff'/>`],
+"Mobile Legends":["#1b3a6b",T('ML',24,'#ffd23f',41,34)]
+};
+/* harga dalam ribuan rupiah (dari pricelist Oci) */
+var D={
+Streaming:[
+["Netflix",[["Sharing 1 user · 1 hari",4],["Sharing 1 user · 1 minggu",15],["Sharing 1 user · 1 bulan",40],["Semi Private · 1 bulan",45],["Private · 1 bulan",185]]],
+["Disney+ Hotstar",[["Daily Premium 6 user · 1 hari",6],["Daily Premium · 7 hari",23],["Basic 3 user · 1 bulan",25],["Premium 6 user · 1 bulan",37],["Premium anti limit · 1 bulan",55]]],
+["Vidio",[["Platinum Mobile · 1 hari",5],["Platinum Mobile · 1 minggu",17],["Platinum All Device 2 user · 1 bulan",34],["Diamond Mobile · 1 bulan",45]]],
+["YouTube Premium",[["Famplan · 1 bulan",10],["Famplan · 2 bulan",20],["Individual · 1 bulan",25],["Mix Plan · 2 bulan",35]]],
+["Amazon Prime Video",[["Sharing 5u · 1 bulan",18],["Sharing anti limit · 1 bulan",23],["Private · 1 bulan",27]]],
+["HBO Max",[["Sharing Standar · 1 bulan",25],["Sharing Ultimate · 1 bulan",30],["Private · 1 bulan",85]]],
+["Viu",[["Private Anti Limit · 1 bulan",17],["3 bulan",32],["6 bulan",43],["1 tahun",55]]],
+["WeTV",[["Sharing · 1 bulan",15],["Sharing · 3 bulan",20],["Sharing · 1 tahun",45]]],
+["iQIYI",[["Standar sharing · 1 bulan",10],["Premium sharing · 1 bulan",15],["Premium · 1 tahun",45]]],
+["Viki Rakuten",[["Sharing · 1 bulan",10],["Sharing · 1 tahun",25]]],
+["Bstation / Bilibili",[["Sharing · 1 bulan",15],["Sharing · 1 tahun",45]]],
+["Crunchyroll",[["Sharing · 1 tahun",20]]],
+["Apple TV+",[["Sharing · 1 bulan",12],["Private · 1 bulan",28]]],
+["Loklok",[["Basic sharing · 1 bulan",25],["Standar sharing · 1 bulan",30]]],
+["Catchplay",[["Sharing · 1 bulan",15],["Sharing · 1 tahun",45]]]],
+Music:[
+["Spotify",[["Family Plan · 1 bulan",30],["Family Plan · 2 bulan",60]]],
+["Apple Music",[["Family iMess · 1 bulan",10],["Family iMess · 2 bulan",20]]],
+["Resso / TikTok Music",[["1 bulan",7]]],
+["Tidal",[["Individual · 1 bulan",3]]]],
+Editing:[
+["Canva",[["Invite · 1 hari",1],["Invite · 1 bulan",5],["Invite · 3 bulan",15],["Invite · 6 bulan",30],["1 tahun member",45],["Edu Lifetime",45]]],
+["CapCut",[["Sharing · 7 hari",10],["Sharing · 1 bulan",23],["Private · 1 bulan",43]]],
+["Picsart Pro",[["Sharing · 1 bulan",10],["Private · 1 bulan",20]]],
+["Ibis Paint",[["1 tahun",20]]],
+["Alight Motion",[["1 bulan",5],["1 tahun",10]]],
+["VN Pro",[["1 tahun",8]]],
+["VSCO",[["Plus · 1 tahun",10],["Pro · 1 tahun",12]]],
+["Lightroom",[["Preset 500+",4],["Preset 2000+",10],["Akun · 1 tahun",8]]],
+["Remini",[["Web · 1 bulan",6],["Lite · 1 tahun",13],["Pro · 1 tahun",23]]],
+["Procreate",[["Lifetime",13]]],
+["InShot",[["Lifetime",13]]],
+["Photoroom",[["1 tahun",13]]]],
+Education:[
+["ChatGPT",[["Plus 5 user · 7 hari",25],["Go 5 user · 1 bulan",30],["Plus 5 user · 1 bulan",45]]],
+["Grammarly",[["Sharing · 1 bulan",7],["Sharing · 3 bulan",16],["Private · 1 bulan",18]]],
+["QuillBot",[["Sharing · 1 bulan",12],["Private · 1 bulan",35]]],
+["Scribd / Everand",[["Sharing · 1 bulan",10],["Private · 1 bulan",20]]],
+["Wattpad",[["Sharing · 1 bulan",10],["1 tahun",35]]],
+["DeepL + Write Pro",[["1 bulan",7]]],
+["CamScanner",[["1 tahun",13]]],["Mathway",[["1 tahun",13]]],["Brainly+",[["1 tahun",13]]],["Quizlet+",[["1 tahun",13]]],
+["iLovePDF",[["1 tahun",13]]],["GoodNotes",[["Lifetime",15]]]],
+Others:[
+["Microsoft 365",[["1 bulan",6]]],
+["Microsoft Copilot",[["Sharing · 1 bulan",17],["Private · 1 bulan",27]]],
+["iCloud",[["50GB · 3-4 bulan",18],["2TB sharing · 1 bulan",40]]],
+["Line Coin",[["10 coin",2.5],["50 coin",10],["100 coin",20],["200 coin",38]]],
+["Get Contact",[["Aktivasi / perpanjang · 1 bulan",10]]],
+["Apple Arcade",[["2-3 bulan",13]]],
+["Muslim Pro + Qalbox",[["Lifetime",13]]]],
+Games:[
+["Robux",[["Topup · tanya nominal via chat",16]]],
+["Mobile Legends",[["Diamonds · tanya nominal via chat",17]]],
+["Games Top-Up / Diamonds",[["Game lain · tanya via chat",16]]]]
+};
+var REV=[["Prosesnya sat-set banget kayak disihir, kak Oci super duper ramah pol! Makasih yaa 🍓","Nisa"],["Aman banget, akun langsung aktif dan ga ada kendala sama sekali. Bakal langganan terus!","Rere"],["Murah meriah tapi pelayanannya bintang lima. Webnya gemes banget bikin betah!","Difa"]];
+var FALLBACK={name:"Oci 🍓",handle:"@lfabubu",bio:"oci’s cafe ✦ premium apps, streaming & sweet digital treats. Happy exploring ♡",followers:null,avatar:null};
+var cur=0,wish={},wn=0,master=true,userPaused=false,ctx=null,warned=false;
+var rp=function(k){return "Rp "+Math.round(k*1000).toLocaleString("id-ID")};
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("on")},2600)}
+
+/* ===== sfx imut (bubble pop & twinkle) ===== */
+function ensure(){try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==="suspended")ctx.resume()}catch(e){}}
+function tone(f,at,dur,type,vol,to){if(!ctx)return;var t=ctx.currentTime+at,o=ctx.createOscillator(),g=ctx.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol||.12,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+dur+.03)}
+var SFX={
+pop:function(){tone(480,0,.1,"sine",.14,900);tone(1400,.02,.05,"sine",.04)},
+up:function(){[784,988,1319,1568].forEach(function(f,i){tone(f,i*.06,.22,"triangle",.1)})},
+down:function(){[1175,880,698].forEach(function(f,i){tone(f,i*.07,.2,"triangle",.09)})},
+heart:function(){tone(1047,0,.14,"sine",.12);tone(1568,.09,.22,"sine",.12);tone(2093,.18,.2,"sine",.05)},
+done:function(){[659,784,988,1319,1568].forEach(function(f,i){tone(f,i*.07,.28,"triangle",.1)})}
+};
+function sfx(n){if(!master)return;ensure();(SFX[n]||SFX.pop)()}
+
+/* ===== V16 playlist: file MP3 + musik box orisinal ===== */
+var au=new Audio(),ti=0;au.volume=.45;au.preload="none";
+var box=null,bi=0;
+function cassettePlaying(on){var el=$("#oci-cassette");if(el)el.classList.toggle("playing",!!on)}
+function boxStop(){if(box){clearInterval(box);box=null}cassettePlaying(false)}
+function boxStart(){
+ if(box||userPaused||!master)return;
+ ensure();
+ if(!ctx||ctx.state!=="running"){toast("Ketuk ▶ untuk mengaktifkan musik ♡");return}
+ $("#pp").textContent="⏸";cassettePlaying(true);
+ var notes=PL[ti].notes||[523,659,784,988,784,659,880,1047,880,659,784,659,587,698,880,698];
+ function beat(){if(!master||userPaused||!ctx||ctx.state!=="running")return;var f=notes[bi++%notes.length];tone(f,0,.75,"sine",.065);tone(f*2,0,.38,"triangle",.02)}
+ beat();box=setInterval(beat,420);
+}
+function loadT(){
+ boxStop();au.pause();au.removeAttribute("src");au.load();bi=0;
+ var t=PL[ti];$("#mt").textContent="♪ "+t.t+" — "+t.a+" ♡";
+ if(t.src)au.src=t.src;
+ $("#pp").textContent="▶";
+}
+function playM(){
+ if(!master||userPaused)return;
+ if(PL[ti].notes){boxStart();return}
+ if(au.error){toast("MP3 belum tersedia, pilih lagu musik box dengan ⏭ ♡");return}
+ var p=au.play();if(p&&p.catch)p.catch(function(){toast("Ketuk ▶ untuk memutar musik ♡")});
+}
+function next(d){var wasPlaying=master&&!userPaused&&(box||!au.paused);ti=(ti+d+PL.length)%PL.length;loadT();if(wasPlaying)playM()}
+au.addEventListener("ended",function(){next(1)});
+au.addEventListener("play",function(){$("#pp").textContent="⏸";cassettePlaying(true)});
+au.addEventListener("pause",function(){if(!box){$("#pp").textContent="▶";cassettePlaying(false)}});
+au.addEventListener("error",function(){if(PL[ti].src)$("#mt").textContent="♪ MP3 belum tersedia — pilih musik box ⏭ ♡"});
+loadT();
+$("#pp").onclick=function(){
+ ensure();master=true;$("#snd").textContent="🔊";
+ if(box){userPaused=!userPaused;this.textContent=userPaused?"▶":"⏸";cassettePlaying(!userPaused);return}
+ if(PL[ti].notes){userPaused=false;boxStart();return}
+ if(au.paused){userPaused=false;playM()}
+ else{userPaused=true;au.pause()}
+};
+$("#pv").onclick=function(){next(-1)};$("#nx").onclick=function(){next(1)};
+$("#snd").onclick=function(){
+ master=!master;this.textContent=master?"🔊":"🔇";
+ if(master){ensure();SFX.pop();userPaused=false;if(box){$("#pp").textContent="⏸";cassettePlaying(true)}else playM()}
+ else{au.pause();cassettePlaying(false);$("#pp").textContent="▶"}
+};
+/* Jadwal toko berdasarkan waktu WIB, bukan zona waktu pengunjung */
+function ociUpdateStoreHours(){
+ var parts=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Jakarta",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());
+ var hour=Number(parts.find(p=>p.type==="hour").value),minute=Number(parts.find(p=>p.type==="minute").value);
+ var open=hour*60+minute>=9*60&&hour*60+minute<23*60;
+ var badge=$("#oci-store-hours"),label=$("#oci-store-hours-label");
+ if(!badge||!label)return;
+ badge.classList.toggle("oci-open-closed",!open);
+ label.textContent=open?"Toko lagi buka & siap bantu orderanmu ♡":"Toko lagi tutup ♡ Buka lagi pukul 09.00 WIB";
+}
+ociUpdateStoreHours();setInterval(ociUpdateStoreHours,30000);
+
+/* ===== logo app: taruh gambar di logos/<nama-app>.png, kalau tidak ada tampil monogram ===== */
+
+var OCI_STREAMING_PRICE_DATA={"Netflix":{"Sharing":{"1 User":[["1 hari",4],["3 hari",8.5],["5 hari",12],["1 minggu",15],["1 bulan",40]],"2 User":[["1 bulan",28]],"Semi Private":[["1 bulan",45]]},"Private":{"Private":[["1 bulan",185]]}},"Viu":{"Private Anti Limit":{"Private Anti Limit":[["1 bulan",17],["2 bulan",25],["3 bulan",32],["6 bulan",43],["1 tahun",55]]}},"Disney+ Hotstar":{"Premium":{"Sharing 6 User":[["1 hari",6],["3 hari",12],["5 hari",18],["7 hari",20],["1 bulan",37]],"Sharing 3 User":[["1 bulan",55]],"Private":[["1 bulan",120]]},"Basic":{"Sharing 3 User":[["1 bulan",30]],"Private":[["1 bulan",80]]}},"Vidio":{"Platinum Mobile":{"Sharing":[["1 hari",5],["3 hari",10],["1 minggu",17],["1 bulan · 2 User",27]],"Private":[["1 bulan",35]]},"Platinum All Device":{"2 User":[["1 bulan",34]],"Private":[["1 bulan",54]]},"Platinum Extra":{},"Ultimate":{},"Bundling TV":{"Private":[["1 tahun",20]]}},"Amazon Prime Video":{"Sharing":{"5 User":[["1 bulan",18]],"4 User":[["1 bulan",20]],"Anti Limit":[["1 bulan",23]]},"Private":{"Private":[["1 bulan",27]]}},"YouTube Premium":{"Famplan":{"Famplan":[["1 bulan",10],["2 bulan",20]]},"Individual":{"Individual":[["1 bulan",25],["3 bulan · Garansi BF",45],["3 bulan · Garansi Disable & BF",50]]},"Mix Plan":{"Mix Plan":[["2 bulan",35],["3 bulan",45],["4 bulan · Garansi BF",55],["4 bulan · Garansi Disable & BF",60],["5 bulan · Garansi BF",65],["5 bulan · Garansi Disable & BF",70]]}},"HBO Max":{"Sharing":{"Standard":[["1 bulan",25]],"Ultimate":[["1 bulan",30]]},"Private":{"Private":[["1 bulan",85]]}},"WeTV":{"Sharing":{"Sharing":[["1 bulan",15],["3 bulan",20],["1 tahun",45]]},"Anti Limit":{"Bisa TV":[["1 bulan",25]]},"Private":{"Private":[["1 bulan",40]]}},"iQIYI":{"Premium":{"Sharing 6 User":[["1 bulan",15],["1 tahun",45]],"Sharing Anti Limit":[],"Private":[["1 bulan",42]]},"Standard":{"Sharing 6 User":[["1 bulan",10]],"Sharing Anti Limit":[],"Private":[["1 bulan",37]]}},"Viki Rakuten":{"Sharing":{"Sharing":[["1 bulan",10],["1 tahun",25]]}},"Bstation / Bilibili":{"Sharing":{"Sharing":[["1 bulan",15],["3 bulan",30],["1 tahun",45]]},"Private":{"Private":[["1 bulan",40]]}},"Youku":{"Sharing":{"Sharing":[["1 bulan",15],["3 bulan",30],["1 tahun",45]]},"Private":{"Private":[["1 bulan",40]]}},"Crunchyroll":{"Sharing":{"Sharing":[["1 tahun",20]]}},"Apple TV+":{"Sharing":{"Sharing":[["1 bulan",12],["2 bulan",20]]},"Private":{"Private":[["1 bulan",28],["3 bulan",48]]}},"Loklok":{"Sharing":{"Basic":[["1 bulan",25]],"Standard · Bisa Login TV":[["1 bulan",30]]},"Private":{"Basic":[["1 bulan",55]],"Standard":[["1 bulan",80]]}},"Catchplay":{"Sharing":{"Sharing":[["1 bulan",15],["3 bulan",30],["1 tahun",45]]}},"Vision+":{"Sharing":{"Sharing":[["1 bulan",15]]},"Private":{"Private":[["1 bulan",30]]}},"RCTI+ Superapp":{"Sharing":{"2 User":[["1 bulan",15]]},"Private":{"Private":[["1 bulan",30]]}},"Mola TV":{"Private":{"Private":[["1 bulan",50]]}},"GagaOOLala":{"Sharing":{"Sharing":[["1 bulan",15]]}},"Genflix":{"Sharing":{"Sharing":[["1 bulan",10]]}},"Iflix":{"Sharing":{"Sharing":[["1 bulan",13],["3 bulan",18],["1 tahun",25]]}},"Sushiroll":{"Sharing":{"Sharing":[["1 bulan",10]]}},"Drakor.id":{"Sharing":{"Sharing":[["1 tahun",15]]}}};
+Object.keys(OCI_STREAMING_PRICE_DATA).forEach(function(name){
+ var groups=OCI_STREAMING_PRICE_DATA[name],items=[];
+ Object.keys(groups).forEach(function(tier){Object.keys(groups[tier]).forEach(function(sub){groups[tier][sub].forEach(function(pair){items.push([tier+' · '+sub+' · '+pair[0],pair[1]])})})});
+ var existing=D.Streaming.find(function(x){return x[0].toLowerCase()===name.toLowerCase()});
+ if(existing)existing[1]=items;else D.Streaming.push([name,items]);
+});
+
+function mono(n){var w=n.replace(/[^A-Za-z0-9+ ]/g," ").trim().split(/\s+/);return (w.length>1?w[0][0]+w[1][0]:w[0][0]).toUpperCase()}
+function slug(n){return n.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+function renderChips(){$("#chips").innerHTML=CATS.map(function(c,i){return '<button class="chip'+(i===cur?" on":"")+'" data-cat="'+i+'">'+c[0]+"</button>"}).join("")}
+function renderGrid(){
+  var c=CATS[cur];
+  $("#grid").innerHTML=D[c[0]].map(function(p,i){
+    var min=Math.min.apply(null,p[1].map(function(x){return x[1]}));
+    var key=c[0]+i;
+    return '<div class="pc" style="background:'+c[1]+'"><div class="pi" style="background:'+(LOGOS[p[0]]?LOGOS[p[0]][0]:(LC[p[0]]||"#ff8fab"))+'">'+(LOGOS[p[0]]?'<svg viewBox="0 0 64 64">'+LOGOS[p[0]][1]+'</svg>':esc(mono(p[0])))+'<img alt="" src="logos/'+slug(p[0])+'.png"></div><div class="nf"><b>'+esc(p[0])+'</b><small>'+p[1].length+' paket</small><span class="pr">Mulai '+rp(min)+'</span></div><div style="text-align:center"><button class="hv'+(wish[key]?" on":"")+'" data-w="'+key+'" aria-label="Wishlist">'+(wish[key]?"💗":"🤍")+'</button><br><button class="b" data-pick="'+i+'" style="font-size:13px;padding:3px 10px">Pilih Paket +</button></div></div>'}).join("");
+  $$(".pi img").forEach(function(im){im.onerror=function(){im.remove()};im.onload=function(){im.parentNode.firstChild.textContent=""}});
+}
+function renderMemos(){$("#memos").innerHTML=REV.map(function(r){return '<div class="memo">'+esc(r[0])+"<b>— "+esc(r[1])+"</b></div>"}).join("")}
+renderChips();renderGrid();renderMemos();
+
+function openM(id){$("#"+id).classList.add("on");sfx("up")}
+function closeAll(){var o=$$(".ov.on");o.forEach(function(x){x.classList.remove("on")});if(o.length)sfx("down")}
+var OCI_SHORT_GUIDES = {
+ 'VSCO': {intro:'Editor foto dengan preset film-style.', plans:[['Plus','200+ preset premium, edit foto/video, dan resep edit tanpa batas.'],['Pro','Semua fitur Plus, preset profesional, edit desktop, dan sinkronisasi proyek.']]},
+ 'Remini': {intro:'Memperjelas foto buram atau resolusi rendah dengan AI.', plans:[['Lite','Enhance foto, filter AI, upscale 2×, tanpa iklan.'],['Pro','Semua fitur Lite, plus enhance video AI, retouch wajah, dan editor web/desktop.'],['Web','Akses Remini lewat browser; fitur mengikuti paket yang diberikan.']]},
+ 'iQIYI': {intro:'Streaming drama, anime, dan variety show.', plans:[['Standar','Hingga 1080p, unduh offline, dan 1 perangkat streaming.'],['Premium','Fitur Standar, hingga 4K jika tersedia, audio tertentu lebih baik, dan 2 perangkat bersamaan.']]},
+ 'ChatGPT': {intro:'Asisten AI untuk chat, ide, belajar, dan pekerjaan.', plans:[['Go','Chat harian dengan batas fitur terpisah; tersedia fitur Think.'],['Plus','Batas penggunaan lebih tinggi, reasoning, analisis, unggah file, dan fitur tambahan.'],['Business','Workspace tim, pengaturan admin, dan fitur kolaborasi.'],['Team','Workspace tim, pengaturan admin, dan fitur kolaborasi.']]},
+ 'Vidio': {intro:'Streaming film, serial, dan olahraga.', plans:[['Platinum','Film, serial, anime, dan hiburan premium; sebagian olahraga internasional tidak termasuk.'],['Ultimate','Termasuk lebih banyak olahraga internasional seperti EPL dan F1 menurut panduan.']]},
+ 'YouTube Premium': {intro:'Menonton tanpa iklan, putar di latar belakang, download offline, termasuk YouTube Music.', plans:[['Famplan','Gabung melalui undangan keluarga memakai akun sendiri.'],['Family','Gabung melalui undangan keluarga memakai akun sendiri.'],['Individual','Akses premium untuk akun pribadi.'],['Mix','Gabungan masa Individual dan Family sesuai ketentuan paket.']]},
+ 'Meitu': {intro:'Edit foto, makeup, retouch, dan efek.', plans:[['VIP+','Fitur VIP dengan tambahan material premium dan dukungan tertentu untuk desktop.'],['VIP','Filter, template, makeup, dan retouch premium di aplikasi.']]},
+ 'Wink': {intro:'Editor dan peningkat kualitas foto/video.', plans:[['VIP+','Termasuk VIP, batch hingga 20 item, dan bonus kredit/kuota lebih besar.'],['VIP','Fitur editing premium, batch hingga 9 item, dan bonus kredit bulanan.']]}
+};
+function ociProductGuide(name){
+ var g=OCI_SHORT_GUIDES[name];
+ if(!g)return '';
+ return '<div class="oci-product-guide"><div class="oci-guide-title">🍓 Penjelasan singkat '+esc(name)+'</div><p>'+esc(g.intro)+'</p><p class="oci-product-guide-note">Detail paket tercantum di bawah setiap harga.</p></div>';
+}
+function ociPlanDescription(name,plan){
+ var g=OCI_SHORT_GUIDES[name];if(!g)return '';
+ var match=g.plans.find(function(x){return plan.toLowerCase().indexOf(x[0].toLowerCase())!==-1});
+ return match?'<div class="oci-plan-desc">'+esc(match[1])+'</div>':'';
+}
+
+var ociSelectedProduct=null;
+var OCI_ORDER_TERMS=['Pembayaran di awal untuk menghindari hit and run.','Tidak ada perubahan atau pergantian akun jika salah memilih paket.','Tidak menerima refund akibat kendala perangkat atau jaringan, kecuali kelalaian seller.','Wajib kirim bukti login untuk mengaktifkan garansi.','Akun berasal dari pasar tidak resmi. Jika bermasalah, mohon sabar menunggu perbaikan sesuai estimasi, tidak spam seller. Oci akan berusaha memberikan pelayanan terbaik.'];
+var OCI_COMMON_NOTES=['Sisa durasi 25 hari tetap dihitung sebagai 1 bulan penuh.'];
+var OCI_SCREEN_LIMIT='Netflix Premium maksimal 4 layar menonton bersamaan. Jika penuh, harus antre; 1 slot sharing berlaku untuk 1 perangkat.';
+var OCI_APP_NOTES={
+ 'Netflix':{'1 User':['Profil khusus milik kamu sendiri (profile private).','Hanya boleh login di 1 perangkat tetap; tidak boleh pindah-pindah device.','Satu akun memiliki sekitar 5 profil berbeda, sehingga risiko limit screen lebih kecil.',OCI_SCREEN_LIMIT], '2 User':['Satu profil dipakai 2 user, masing-masing di 1 perangkat.','Riwayat tontonan tercampur.','Paket hemat, tetapi total pengguna akun bisa mencapai 10 user sehingga risiko antre lebih tinggi.',OCI_SCREEN_LIMIT], 'Semi Private':['Profil khusus milik sendiri.','Boleh login di 2 perangkat tetap, tidak boleh berganti-ganti perangkat.','Tidak boleh streaming di kedua perangkat bersamaan; menonton harus bergantian.','Total akun sekitar 5 user.',OCI_SCREEN_LIMIT], 'Private':['Akses penuh semua profil selama masa langganan.','Bebas mengubah ikon, nama, PIN, dan password profil/akun sesuai ketentuan.','Bisa digunakan keluarga atau dijual kembali, maksimal login 8 perangkat.','Lebih personal dan tidak terganggu pengguna lain jika digunakan sendiri/keluarga.']},
+ 'Disney+ Hotstar':{'Premium':['Film dan serial tanpa jeda iklan, kualitas hingga 4K UHD dan Dolby Atmos/5.1 jika didukung.','Bisa download offline.','Hanya login 1 perangkat tetap. Logout sengaja dikenakan biaya login ulang Rp3.000.','Maksimal 3 layar streaming bersamaan. Sharing 3 User anti limit; Sharing 6 User tidak menerima komplain limit screen.'], 'Basic':['Akses katalog Disney+ dan download offline.','Kualitas maksimal Full HD 1080p, bukan 4K.','Hanya login 1 perangkat tetap. Logout sengaja dikenakan biaya login ulang Rp3.000.','Streaming hanya 1 layar bersamaan; tidak menerima komplain limit screen.']},
+ 'Vidio':{'Platinum Mobile':['Khusus HP, tablet, dan iPad.','Film/series premium, drama Korea dan Asia, anime, Vidio Originals, olahraga lokal, variety show.','Full HD 1080p; belum termasuk Premier League, F1, Serie A, BWF, SPOTV, Champions Golf.','Tidak tersedia watch party; iklan mungkin muncul saat live.'], 'Platinum All Device':['Bisa digunakan di HP, tablet, laptop, dan TV yang didukung.','Film/series premium, drama Korea dan Asia, anime, Vidio Originals, olahraga lokal, variety show.','Full HD 1080p; belum termasuk Premier League, F1, Serie A, BWF, SPOTV, Champions Golf.','Tidak tersedia watch party; iklan mungkin muncul saat live.'], 'Platinum Extra':['Semua konten Platinum ditambah SPOTV dan sebagian turnamen BWF serta olahraga internasional tertentu.','Maksimal Full HD 1080p, belum 4K.','Belum termasuk Premier League dan Champions Golf; tidak ada watch party, live mungkin beriklan.'], 'Ultimate':['Akses olahraga luas: Premier League, Liga 1, Serie A, LaLiga, UCL, UEL, MotoGP, F1, BWF, dan SPOTV.','Sebagian tayangan mendukung 4K pada perangkat yang kompatibel.','Ada opsi bundling Disney+ Hotstar.','Menurut rincian paket, Champions Golf belum termasuk; live tertentu mungkin tetap beriklan dan tidak ada watch party.']},
+ 'YouTube Premium':{'Famplan':['Bisa memakai akun seller; tambahan Rp7.000 jika memerlukan Gmail dari seller.','Akun undangan tidak boleh sudah 2 kali bergabung ke family dalam 1 tahun; jika sudah, gunakan email lain.','Durasi lebih dari 1 bulan menggunakan sistem renewal setiap bulan.'], 'Individual':['Bisa request akun seller atau buyer.'], 'Mix Plan':['Menggunakan sistem renewal; akses premium diperpanjang setiap bulan.']},
+ 'iQIYI':{'Premium':['Region Indonesia.','Sharing 6 User dilarang login TV; hanya Private/Anti Limit yang boleh login TV.'], 'Standard':['Region Indonesia.','Sharing 6 User dilarang login TV; hanya Private/Anti Limit yang boleh login TV.']},
+ 'Picsart Pro':{'default':['Paket sharing digunakan bersama 4 user.','Setiap akun mendapat 500 kredit AI. Jika habis, kredit tambahan harus dibeli sendiri; kuota tidak unlimited.']}
+};
+var OCI_VIDIO_DEVICE=['Streaming hanya di 1 perangkat pada satu waktu; dua layar bersamaan memunculkan peringatan Multiple Device.','Boleh login maksimal di 2 perangkat tetap. Lebih dari 2 perangkat berisiko terblokir dan garansi hangus.'];
+function ociGetNotes(name,tier,sub,rows){
+ var arr=OCI_COMMON_NOTES.slice();
+ var g=OCI_APP_NOTES[name];if(g)arr=arr.concat(g[sub]||g[tier]||g.default||[]);
+ if(name==='Vidio' && /Platinum|Ultimate/.test(tier))arr=arr.concat(OCI_VIDIO_DEVICE);
+ if(name==='YouTube Premium' && tier==='Famplan' && sub!=='Famplan')arr=arr.concat(g.Famplan);
+ if(name==='iQIYI' && /Anti Limit|Private/.test(sub))arr.push('Paket ini boleh digunakan untuk login TV.');
+ if(name==='Picsart Pro' && !g)arr.push('Paket sharing digunakan bersama 4 user; tiap akun mendapat 500 kredit AI.');
+ if(rows.some(function(x){return /1 tahun|12 bulan|1 year/i.test(x.label)}))arr.push('Paket berdurasi 1 tahun hanya bergaransi 6 bulan.');
+ return arr;
+}
+function ociNotesBox(title,arr){return '<details class="oci-info-fold"><summary>'+esc(title)+'</summary><ul>'+arr.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ul></details>'}
+function ociTier(name){var a=name.toLowerCase();if(/semi.private/.test(a))return 'Semi Private';if(/private/.test(a))return 'Private';if(/sharing/.test(a))return 'Sharing';if(/premium/.test(a))return 'Premium';if(/standar|standard/.test(a))return 'Standard';if(/plus/.test(a))return 'Plus';if(/pro/.test(a))return 'Pro';if(/lite/.test(a))return 'Lite';if(/go\b/.test(a))return 'Go';if(/platinum/.test(a))return 'Platinum';if(/diamond/.test(a))return 'Diamond';if(/ultimate/.test(a))return 'Ultimate';if(/individual/.test(a))return 'Individual';if(/famplan|family/.test(a))return 'Family';if(/mix/.test(a))return 'Mix';return 'Pilihan Paket'}
+var ociSelectedProductIndex=0;
+function ociPriceCards(rows){
+ var p=ociSelectedProduct;
+ return '<div id="oci-price-list">'+rows.map(function(o){return '<div class="oci-price-card"><div><b>'+esc(o.label)+'</b><strong>'+rp(o.price)+'</strong>'+ociPlanDescription(p[0],o.full)+'</div><button class="b" data-order="'+ociSelectedProductIndex+','+o.index+'">Order ↗</button></div>'}).join('')+'</div>';
+}
+function ociShowSubtier(tier,sub){
+ var p=ociSelectedProduct,groups=OCI_STREAMING_PRICE_DATA[p[0]],subt=groups[tier];
+ document.querySelectorAll('#oci-subtiers button').forEach(function(b){b.classList.toggle('on',b.dataset.subtier===sub)});
+ var rows=[];(subt[sub]||[]).forEach(function(pair){var full=tier+' · '+sub+' · '+pair[0],index=p[1].findIndex(function(x){return x[0]===full});rows.push({label:pair[0],price:pair[1],index:index,full:full})});
+ var h=rows.length?ociPriceCards(rows):'<p class="oci-pick-hint">Harga paket ini belum tersedia. Silakan tanyakan ke Oci.</p>';
+ h+=ociNotesBox('🍓 Catatan '+p[0]+' · '+sub,ociGetNotes(p[0],tier,sub,rows));
+ h+=ociNotesBox('📌 Wajib Baca Sebelum Order',OCI_ORDER_TERMS);
+ document.getElementById('oci-price-wrap').innerHTML=h;
+}
+function ociShowTier(tier){
+ var p=ociSelectedProduct;if(!p)return;
+ document.querySelectorAll('#oci-tiers button').forEach(function(b){b.classList.toggle('on',b.dataset.tier===tier)});
+ var groups=OCI_STREAMING_PRICE_DATA[p[0]],html='';
+ if(groups){
+  var subs=Object.keys(groups[tier]);
+  html='<p class="oci-pick-hint">Pilih jenis akun:</p><div class="oci-subtiers" id="oci-subtiers">'+subs.map(function(sub){return '<button type="button" data-subtier="'+esc(sub)+'">'+esc(sub)+'</button>'}).join('')+'</div><div id="oci-price-wrap"></div>';
+ }else{
+  var rows=p[1].map(function(x,i){return {label:x[0],price:x[1],index:i,full:x[0],tier:ociTier(x[0])}}).filter(function(x){return x.tier===tier});
+  html=ociPriceCards(rows);
+  if(CATS[cur][0]!=='Games'){
+   html+=ociNotesBox('🍓 Catatan '+p[0],ociGetNotes(p[0],tier,tier,rows).concat(OCI_SHORT_GUIDES[p[0]]?[OCI_SHORT_GUIDES[p[0]].intro]:[]));
+   html+=ociNotesBox('📌 Wajib Baca Sebelum Order',OCI_ORDER_TERMS);
+  }
+ }
+ document.getElementById('oci-tier-body').innerHTML=html;
+ if(groups)ociShowSubtier(tier,Object.keys(groups[tier])[0]);
+}
+function pick(i){
+ var p=D[CATS[cur][0]][i];ociSelectedProduct=p;ociSelectedProductIndex=i;
+ $('#pt').textContent=p[0]+' — pilih paket';
+ var groups=OCI_STREAMING_PRICE_DATA[p[0]];
+ var tiers=groups?Object.keys(groups):[...new Set(p[1].map(function(x){return ociTier(x[0])}))];
+ $('#pb').innerHTML='<p class="oci-pick-hint">Pilih kategori paket, jenis akun, lalu durasi & harga.</p><div class="oci-tier-buttons" id="oci-tiers">'+tiers.map(function(t){return '<button type="button" data-tier="'+esc(t)+'">'+esc(t)+'</button>'}).join('')+'</div><div id="oci-tier-body"></div>';
+ $('#om').innerHTML='';openM('m-pk');ociShowTier(tiers[0]);
+}
+document.addEventListener('click',function(e){
+ var tier=e.target.closest('[data-tier]');if(tier){ociShowTier(tier.dataset.tier);return}
+ var sub=e.target.closest('[data-subtier]');if(sub){var selected=document.querySelector('#oci-tiers button.on');if(selected)ociShowSubtier(selected.dataset.tier,sub.dataset.subtier);return}
+});
+function waUrl(msg){return "https://wa.me/"+WA+"?text="+encodeURIComponent(msg)}
+function order(i,k){
+  var p=D[CATS[cur][0]][i],x=p[1][k];
+  var msg="Halo kak Oci! Aku mau order "+p[0]+" – "+x[0]+" ("+rp(x[1])+"). Aku sudah baca aturan & garansi tokonya ya.";
+  sfx("done");
+  try{navigator.clipboard.writeText(msg)}catch(e){}
+  $("#om").innerHTML='<div class="memo" style="margin-top:14px">'+esc(msg)+'</div><p style="margin-top:8px;font-size:14px">Kalau WhatsApp tidak terbuka otomatis, salin pesan di atas dan kirim ke <b>0881-0123-10046</b> ♡</p>';
+  if(/claude/i.test(location.hostname)){toast("Mode preview: kirim pesan manual ke 0881-0123-10046 ♡");return}
+  toast("Membuka WhatsApp Oci ♡");
+  var w=window.open(waUrl(msg),"_blank","noopener");if(!w)location.href=waUrl(msg);
+}
+$("#wa").href=waUrl("Halo kak Oci! Aku mau tanya-tanya soal produk di Oci’s Little Land ♡");
+if(/claude/i.test(location.hostname)){$("#wa").onclick=function(e){e.preventDefault();toast("WhatsApp Oci: 0881-0123-10046 ♡")}}
+document.addEventListener("click",function(e){
+  var t=e.target,m;
+  if((m=t.closest("[data-open]"))){openM(m.getAttribute("data-open"));return}
+  if(t.closest("[data-close]")||t.classList.contains("ov")){closeAll();return}
+  if((m=t.closest("[data-tab]"))){$$("[data-tab]").forEach(function(b){b.classList.toggle("on",b===m)});$$(".pane").forEach(function(p){p.classList.toggle("on",p.id===m.getAttribute("data-tab"))});sfx("pop");return}
+  if((m=t.closest("[data-cat]"))){cur=+m.getAttribute("data-cat");renderChips();renderGrid();sfx("pop");return}
+  if((m=t.closest("[data-pick]"))){pick(+m.getAttribute("data-pick"));return}
+  if((m=t.closest("[data-order]"))){var a=m.getAttribute("data-order").split(",");order(+a[0],+a[1]);return}
+  if((m=t.closest("[data-w]"))){var k=m.getAttribute("data-w");if(wish[k]){delete wish[k];wn--;sfx("pop")}else{wish[k]=1;wn++;toast("Masuk wishlist ♡");sfx("heart")}$("#wc").textContent=wn;renderGrid();return}
+  if(t.closest("#snd,#pp,#pv,#nx,#rs,#bell,#wl"))return;
+  if(t.closest("button,a.b"))sfx("pop");
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeAll()});
+$("#bell").onclick=function(){toast("Beruang bilang: belum ada kabar baru, tapi kamu manis banget 🐻");sfx("heart")};
+$("#wl").onclick=function(){toast(wn+" item di wishlist-mu 🎀");sfx("pop")};
+$("#rs").onclick=function(){
+  if(typeof window.sendOciReview === "function") window.sendOciReview();
+  else toast("Sedang menghubungkan ulasan, coba sebentar lagi ♡");
+};
+
+/* ===== judul pixel-script (gaya Figure 8 Market) ===== */
+async function pix(el){
+  var txt=el.getAttribute("data-px"),fs=+el.getAttribute("data-s")||20,col=getComputedStyle(el).color;
+  try{await document.fonts.load("20px Playball",txt)}catch(e){}
+  var avail=Math.max(120,el.clientWidth-8),c=document.createElement("canvas"),x=c.getContext("2d"),w,h;
+  for(;fs>8;fs--){x.font=fs+"px Playball";w=Math.ceil(x.measureText(txt).width)+6;if(w*2<=avail)break}
+  h=Math.ceil(fs*1.8);c.width=w;c.height=h;x.font=fs+"px Playball";x.fillStyle=col;x.textBaseline="middle";x.fillText(txt,3,h*.55);
+  var im=x.getImageData(0,0,w,h),d=im.data;for(var i=3;i<d.length;i+=4)d[i]=d[i]>80?255:0;x.putImageData(im,0,0);
+  var sc=w*3<=avail?3:2;c.style.width=w*sc+"px";c.style.height=h*sc+"px";c.style.imageRendering="pixelated";
+  el.textContent="";el.appendChild(c);el.setAttribute("role","img");el.setAttribute("aria-label",txt);
+}
+function runPix(){try{$$("[data-px]").forEach(pix)}catch(e){}}
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(runPix);
+
+/* ===== sync profil Twitter/X @lfabubu ===== */
+function applyProfile(d){
+  var av=$("#profile-avatar");av.classList.remove("ld");
+  ["#profile-name","#profile-bio","#followers-count"].forEach(function(s){$(s).classList.remove("sk")});
+  $("#profile-name").textContent=d.name||FALLBACK.name;
+  $("#profile-handle").textContent=d.handle||FALLBACK.handle;
+  $("#profile-bio").textContent=d.bio||FALLBACK.bio;
+  $("#followers-count").textContent=d.followers==null?"♡":Number(d.followers).toLocaleString("id-ID");
+  if(d.avatar){var img=new Image();img.alt="Avatar @lfabubu";img.onload=function(){av.textContent="";av.appendChild(img)};img.src=d.avatar}
+}
+function limit(ms){return new Promise(function(_,r){setTimeout(function(){r(new Error("timeout"))},ms)})}
+async function fetchProfile(user){
+  var res=await Promise.race([fetch("https://api.fxtwitter.com/"+encodeURIComponent(user),{headers:{Accept:"application/json"}}),limit(4000)]);
+  if(!res.ok)throw new Error("HTTP "+res.status);
+  var u=(await res.json()).user;if(!u)throw new Error("no data");
+  return {name:u.name,handle:"@"+u.screen_name,bio:u.description,followers:u.followers_count!=null?u.followers_count:u.followers,avatar:(u.avatar_url||"").replace("_normal","_400x400")};
+}
+applyProfile(FALLBACK);
+fetchProfile("lfabubu").then(applyProfile).catch(function(){applyProfile(FALLBACK)});
+})();
+</script>
+
+<!-- Firebase: review publik tersimpan di Cloud Firestore -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBr5mX1ZIy4HcYU2IsbjoI0JWwRlocW1ZE",
+  authDomain: "ocis-little-land.firebaseapp.com",
+  projectId: "ocis-little-land",
+  storageBucket: "ocis-little-land.firebasestorage.app",
+  messagingSenderId: "645650600100",
+  appId: "1:645650600100:web:0b7b7f8c6ae8d64998d631",
+  measurementId: "G-X2QTXZGV5D"
+};
+
+const db = getFirestore(initializeApp(firebaseConfig));
+const escapeText = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const memoBox = document.getElementById('memos');
+const sendButton = document.getElementById('rs');
+
+onSnapshot(query(collection(db, 'reviews'), orderBy('createdAt', 'desc'), limit(60)), snapshot => {
+  memoBox.innerHTML = snapshot.docs.map(doc => {
+    const item = doc.data();
+    return '<div class="memo">' + escapeText(item.message || '') + '<b>— ' + escapeText(item.name || 'Anonim') + '</b></div>';
+  }).join('') || '<div class="memo">Belum ada cerita, yuk jadi yang pertama! ♡</div>';
+}, error => {
+  console.error('Tidak bisa memuat ulasan:', error);
+  memoBox.innerHTML = '<div class="memo">Ulasan belum bisa dimuat. Coba refresh nanti ya ♡</div>';
+});
+
+let sending = false;
+window.sendOciReview = async function() {
+  if (sending) return;
+  const nameInput = document.getElementById('rn');
+  const messageInput = document.getElementById('rt');
+  const name = nameInput.value.trim();
+  const message = messageInput.value.trim();
+  if (!name || !message) { alert('Isi nama dan ceritamu dulu ya ♡'); return; }
+  if (name.length > 40 || message.length > 500) { alert('Ulasannya terlalu panjang ya ♡'); return; }
+  sending = true;
+  sendButton.disabled = true;
+  sendButton.textContent = 'Mengirim... ♡';
+  try {
+    await addDoc(collection(db, 'reviews'), { name, message, createdAt: serverTimestamp() });
+    nameInput.value = '';
+    messageInput.value = '';
+    document.querySelectorAll('.ov.on').forEach(el => el.classList.remove('on'));
+    alert('Timaaciw! Testimu sudah tersimpan dan bisa dilihat semua orang ♡');
+  } catch (error) {
+    console.error('Gagal mengirim ulasan:', error);
+    alert('Belum berhasil mengirim review. Coba lagi sebentar ya ♡');
+  } finally {
+    sending = false;
+    sendButton.disabled = false;
+    sendButton.textContent = 'Kirim Review →';
+  }
+};
+</script>
+
+<script>
+/* Halaman Oci tambahan: penyimpanan lokal saja, bukan autentikasi */
+(function(){
+'use strict';
+const get=id=>document.getElementById(id);
+const storage={read(k){try{return localStorage.getItem(k)}catch(e){return null}},write(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const phoneKey='oci_phone_v1';
+function refreshLogin(){const p=storage.read(phoneKey);get('oci-login').classList.toggle('hidden',!!p);get('oci-menu-phone').textContent=p?'📱 '+p:'';}
+get('oci-login-form').addEventListener('submit',function(e){e.preventDefault();const p=get('oci-phone').value.replace(/[^0-9+]/g,'');if(!/^(?:\+?62|0)[0-9]{8,13}$/.test(p)){alert('Masukkan nomor HP Indonesia yang benar ya ♡');return;}storage.write(phoneKey,p);refreshLogin();window.dispatchEvent(new Event('oci-phone-changed'));});
+function closeMenu(){get('oci-menu').classList.remove('show');get('oci-menu-shade').classList.remove('show')}
+get('oci-menu-open').onclick=()=>{get('oci-menu').classList.add('show');get('oci-menu-shade').classList.add('show')};
+get('oci-menu-close').onclick=closeMenu;get('oci-menu-shade').onclick=closeMenu;
+document.querySelectorAll('[data-oci-page]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.oci-screen').forEach(el=>el.classList.toggle('active',el.id===btn.dataset.ociPage));closeMenu();window.scrollTo({top:0,behavior:'smooth'});}));
+get('oci-switch-phone').onclick=()=>{closeMenu();storage.del(phoneKey);get('oci-phone').value='';refreshLogin();window.dispatchEvent(new Event('oci-phone-changed'))};
+document.querySelectorAll('[data-oci-accordion]').forEach(btn=>btn.addEventListener('click',()=>get(btn.dataset.ociAccordion).classList.toggle('show')));
+// Tombol penukaran dihubungkan ke Firebase pada modul V10 di bawah.
+get('oci-reward-chat').href='https://wa.me/62881012310046?text='+encodeURIComponent('Halo kak Oci! Aku mau tanya tentang Loyalty Card dan kode stamp 🍓');
+const ordersKey='oci_order_drafts_v1';
+function loadOrders(){try{const a=JSON.parse(storage.read(ordersKey)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
+let onlineOrders=[];
+function renderOrders(){
+ const box=get('oci-order-list');box.replaceChildren();const local=loadOrders();
+ const online=onlineOrders.map((x,i)=>({...x,online:true,key:'cloud-'+i}));
+ // Hindari kartu draft lokal ganda ketika order yang sama sudah tercatat online.
+ const unmatched=local.filter(x=>!online.some(y=>String(y.product||'').includes(x.product||'__none__')&&Math.abs(Number(y.price||0)-Number(String(x.price||'').replace(/[^0-9]/g,'')))<1));
+ const entries=[...online,...unmatched.map((x,i)=>({...x,online:false,localIndex:i}))];
+ if(!entries.length){const p=document.createElement('p');p.className='sub';p.textContent='Belum ada invoice untuk nomor ini ♡';box.append(p);return}
+ entries.forEach((item,i)=>{
+  const card=document.createElement('div');card.className='oci-invoice';const open=document.createElement('button');open.className='oci-receipt-open';open.type='button';
+  const head=document.createElement('div');head.className='oci-receipt-head';const emoji=document.createElement('span');emoji.className='oci-receipt-emoji';emoji.textContent='🧾';
+  const info=document.createElement('div');const title=document.createElement('div');title.className='oci-receipt-title';title.textContent=item.product||'Pesanan Oci';const hint=document.createElement('div');hint.className='oci-receipt-hint';hint.textContent='🍓 Ketuk untuk buka struk belanja ♡';info.append(title,hint);head.append(emoji,info);
+  const status=document.createElement('div');status.className='oci-receipt-status'+(item.online&&item.status==='paid'?' paid':'');status.textContent=item.online?(item.status==='paid'?'💗 LUNAS':'⏳ Belum lunas'):'📝 Menunggu konfirmasi';open.append(head,status);open.onclick=()=>showOciReceipt(item,i);card.append(open);box.append(card)
+ });
+}
+function showOciReceipt(item,i){
+ const overlay=document.createElement('div');overlay.className='oci-receipt-overlay show';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Struk belanja Oci');
+ const sheet=document.createElement('div');sheet.className='oci-receipt-sheet';const paper=document.createElement('div');paper.className='oci-receipt-paper';
+ const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};
+ paper.append(el('div','cute','🍓 🐰 🎀'),el('h2','','oci’s little land'),el('p','tiny','~ little strawberry receipt ~'));
+ const line=(k,v)=>{const row=el('div','oci-receipt-line');row.append(el('span','',k),el('span','',v));paper.append(row)};
+ const seed=String(item.id||item.draftId||[item.date,item.product,item.price].join('|'));let h=2166136261;for(let j=0;j<seed.length;j++){h=Math.imul(h^seed.charCodeAt(j),16777619)}const hex=(h>>>0).toString(16).toUpperCase().padStart(8,'0');const themes=['BERRY','MOCHI','BUNNY','SWEET','PEACH','RIBBON','CHERRY','CUPCAKE'];const num=themes[(h>>>0)%themes.length]+'-'+hex.slice(0,4)+'-'+hex.slice(4);
+ paper.append(el('div','oci-receipt-rule'));line('No. Invoice',num);line('Tanggal',item.date?new Date(item.date).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'-');line('No. HP',localStorage.getItem('oci_phone_v1')||'-');
+ paper.append(el('div','oci-receipt-rule'));line('Pesanan',(item.product||'Pesanan')+(item.package?' · '+item.package:''));const price=item.online?'Rp'+Number(item.price||0).toLocaleString('id-ID'):(item.price||'-');line('Harga',price);
+ paper.append(el('div','oci-receipt-rule'));const total=el('div','oci-receipt-line oci-receipt-total');total.append(el('span','','TOTAL'),el('span','',price));paper.append(total);
+ paper.append(el('div','oci-receipt-rule'));line('Pembayaran',item.online&&item.status==='paid'?'💗 LUNAS':'⏳ Belum lunas');line('Bukti login',item.online&&item.proof?'📸 Diterima':'Belum diterima');
+ if(item.online&&item.status==='paid'&&item.accountEmail){paper.append(el('div','oci-receipt-rule'));line('💌 Email akun',item.accountEmail);const copy=el('button','','📋 Salin email akun');copy.type='button';copy.style.cssText='border:2px solid #e8a6c1;background:#fff0f7;border-radius:20px;padding:8px;color:#ad4471';copy.onclick=()=>navigator.clipboard.writeText(item.accountEmail).then(()=>alert('Email berhasil disalin ♡')).catch(()=>prompt('Salin email:',item.accountEmail));paper.append(copy)}
+ paper.append(el('div','oci-receipt-rule'),el('p','tiny','thank you for shopping at oci’s little land ♡'));
+ const actions=el('div','oci-receipt-actions');const close=el('button','','✕ Tutup');close.onclick=()=>overlay.remove();const print=el('button','','🧾 Simpan PDF');print.onclick=()=>window.print();const chat=el('a','','💌 Chat Oci');chat.href='https://wa.me/62881012310046?text='+encodeURIComponent('Halo Oci, aku mau tanya invoice '+num+' ♡');chat.target='_blank';chat.rel='noopener';actions.append(close,print,chat);sheet.append(paper,actions);overlay.append(sheet);overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};document.body.append(overlay)
+}
+window.ociSetOnlineOrders=items=>{onlineOrders=Array.isArray(items)?items:[];renderOrders()};
+/* Simpan catatan saat pembeli klik tombol Order di katalog; bukan invoice resmi. */
+document.addEventListener('click',e=>{const btn=e.target.closest('[data-order]');if(!btn)return;const modal=get('m-pk');const product=get('pt').textContent.replace(/ — pilih paket$/,'');const rows=Array.from(get('pb').querySelectorAll('[data-order]'));const row=btn.closest('.vr');const pack=row?.querySelector('div')?.textContent||'';const price=row?.querySelector('.pr')?.textContent||'';const msg='Halo kak Oci! Aku mau order '+product+' – '+pack+'. Aku sudah baca aturan & garansi tokonya ya.';const a=loadOrders();a.unshift({id:(globalThis.crypto?.randomUUID?.()||String(Date.now())+Math.random()),date:new Date().toISOString(),product,package:pack.replace(price,''),price,message:msg});storage.write(ordersKey,JSON.stringify(a.slice(0,50)));renderOrders();},true);
+renderOrders();refreshLogin();
+})();
+</script>
+
+<script type="module">
+/* Rekap Firebase admin; Firestore Rules wajib membatasi orders ke UID admin. */
+import {initializeApp,getApps,getApp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import {getFirestore,collection,onSnapshot,doc,writeBatch,runTransaction,getDoc,Timestamp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+const app=getApps().length?getApp():initializeApp({apiKey:'AIzaSyBr5mX1ZIy4HcYU2IsbjoI0JWwRlocW1ZE',authDomain:'ocis-little-land.firebaseapp.com',projectId:'ocis-little-land',appId:'1:645650600100:web:0b7b7f8c6ae8d64998d631'});
+const auth=getAuth(app),db=getFirestore(app),adminUID='DWSHFrWzATYOAATyJ7eoYMHT2XJ2';
+const ordersRef=collection(db,'orders');
+const normPhone=p=>{let n=String(p||'').replace(/\D/g,'');if(n.startsWith('0'))n='62'+n.slice(1);return /^62\d{8,13}$/.test(n)?n:null};
+async function phoneHash(p){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));return Array.from(new Uint8Array(h),b=>b.toString(16).padStart(2,'0')).join('')}
+let buyerUnsub=null,buyerGeneration=0;
+async function watchBuyer(){
+ const gen=++buyerGeneration;if(buyerUnsub){buyerUnsub();buyerUnsub=null}
+ const root=document.getElementById('oci-order-list');if(!root)return;
+ const phone=normPhone(localStorage.getItem('oci_phone_v1'));
+ if(!phone){window.ociSetOnlineOrders?.([]);return}
+ const hash=await phoneHash(phone);if(gen!==buyerGeneration)return;
+ buyerUnsub=onSnapshot(doc(db,'buyerStatus',hash),snap=>{
+  const items=snap.exists()&&Array.isArray(snap.data().orders)?snap.data().orders:[];
+  window.ociSetOnlineOrders?.(items);
+ },err=>{console.error('Gagal memuat invoice buyer',err);window.ociSetOnlineOrders?.([])})
+}
+window.addEventListener('oci-phone-changed',watchBuyer);watchBuyer();
+let lastCelebratedKey='';
+const celebration=document.getElementById('oci-celebrate');
+const rewardChatButton=document.getElementById('oci-reward-chat');
+function updateRewardChat(count,phone){
+ if(count===8&&phone){
+  const msg='Halo Oci! 🍓 Aku sudah mengumpulkan 8/8 stamp di Oci’s Little Land dan mau klaim hadiah aplikasi premium/topup games maksimal Rp30.000. Tolong cek kartu loyalty nomor +'+phone+' yaa ♡';
+  rewardChatButton.textContent='🎁 Klaim Hadiah Sekarang!';
+  rewardChatButton.href='https://wa.me/62881012310046?text='+encodeURIComponent(msg);
+ }else{
+  rewardChatButton.textContent='Tanya Stamp ke Oci ↗';
+  rewardChatButton.href='https://wa.me/62881012310046?text='+encodeURIComponent('Halo kak Oci! Aku mau tanya tentang Loyalty Card dan kode stamp 🍓');
+ }
+}
+const closeCelebration=()=>celebration.classList.remove('show');
+document.getElementById('oci-celebrate-close').addEventListener('click',closeCelebration);
+celebration.addEventListener('click',e=>{if(e.target===celebration)closeCelebration()});
+function showCelebration(phone,hash,stampData){
+ const key=hash+':'+String(stampData.lastCode||'');
+ if(lastCelebratedKey===key)return;
+ lastCelebratedKey=key;
+ const confetti=document.getElementById('oci-confetti');confetti.textContent='';
+ for(let i=0;i<24;i++){
+  const el=document.createElement('i');el.textContent=['🍓','🎀','✨','💗','🌸'][i%5];
+  el.style.left=(i*37%100)+'%';el.style.fontSize=(13+i%4*4)+'px';
+  el.style.animationDelay=(-i*.19)+'s';el.style.animationDuration=(2.7+i%5*.32)+'s';confetti.appendChild(el);
+ }
+ const msg='Halo Oci! 🍓 Aku sudah mengumpulkan 8/8 stamp di Oci’s Little Land dan mau klaim hadiah aplikasi premium/topup games maksimal Rp30.000. Tolong cek kartu loyalty nomor +'+phone+' yaa ♡';
+ document.getElementById('oci-celebrate-wa').href='https://wa.me/62881012310046?text='+encodeURIComponent(msg);
+ celebration.classList.add('show');
+}
+let loyaltyUnsub=null,loyaltyGeneration=0;
+async function watchLoyalty(){
+ const generation=++loyaltyGeneration;if(loyaltyUnsub){loyaltyUnsub();loyaltyUnsub=null}
+ const phone=normPhone(localStorage.getItem('oci_phone_v1'));
+ const progress=document.querySelector('.oci-progress');const tiles=[...document.querySelectorAll('.oci-stamp')];
+ function paint(count,expiresAt){const expiry=expiresAt&&typeof expiresAt.toDate==='function'?expiresAt.toDate():null;const expired=expiry&&expiry.getTime()<=Date.now();count=expired?0:Math.max(0,Math.min(8,Number(count)||0));progress.textContent='🍓 '+count+' / 8 stamp'+(count===0?' · Yuk mulai kumpulkan stempel! ♡':expired?' · masa berlaku habis, mulai kartu baru ♡':expiry?' · berlaku sampai '+expiry.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):' · tanggal berlaku belum tercatat ♡')+(count===8?' · hadiah siap diklaim! 🎁':'');tiles.forEach((tile,i)=>{tile.classList.toggle('reward',i<count);tile.querySelector('span').style.opacity=i<count?'1':'.4';tile.querySelector('span').style.filter=i<count?'none':'grayscale(1)'})}
+ paint(0);updateRewardChat(0,phone);if(!phone)return;
+ const hash=await phoneHash(phone);if(generation!==loyaltyGeneration)return;
+ loyaltyUnsub=onSnapshot(doc(db,'loyaltyCards',hash),snap=>{
+  const data=snap.exists()?snap.data():{};
+  paint(data.count||0,data.expiresAt||null);
+  const expiry=data.expiresAt&&typeof data.expiresAt.toDate==='function'?data.expiresAt.toDate():null;
+  const eligible=Number(data.count)===8&&(!expiry||expiry.getTime()>Date.now());
+  updateRewardChat(eligible?8:0,phone);
+  if(eligible)showCelebration(phone,hash,data);
+},err=>{console.error(err);progress.textContent='Gagal memuat stamp, coba refresh ♡'});
+}
+window.addEventListener('oci-phone-changed',watchLoyalty);watchLoyalty();
+document.getElementById('oci-stamp-submit').addEventListener('click',async()=>{
+ const input=document.getElementById('oci-stamp-code'),button=document.getElementById('oci-stamp-submit');
+ const code=input.value.trim().toUpperCase();const phone=normPhone(localStorage.getItem('oci_phone_v1'));
+ if(!phone){alert('Masukkan nomor WhatsApp dulu ya ♡');return}
+ if(!/^[A-Z0-9-]{8,50}$/.test(code)){alert('Kode stamp belum benar ♡');return}
+ button.disabled=true;button.textContent='Menempel strawberry... 🍓';
+ try{
+  const hash=await phoneHash(phone),codeRef=doc(db,'stampCodes',code),cardRef=doc(db,'loyaltyCards',hash);
+  await runTransaction(db,async tx=>{
+   const codeSnap=await tx.get(codeRef),cardSnap=await tx.get(cardRef);
+   if(!codeSnap.exists())throw Error('Kode tidak ditemukan. Cek lagi kode dari Oci.');
+   const token=codeSnap.data();if(token.used)throw Error('Kode ini sudah pernah ditukarkan.');
+   if(token.phoneHash!==hash)throw Error('Kode ini bukan untuk nomor WhatsApp yang sedang masuk.');
+   const current=cardSnap.exists()?Number(cardSnap.data().count||0):0;
+   const previous=cardSnap.exists()?cardSnap.data():{};
+   const expiry=previous.expiresAt&&typeof previous.expiresAt.toDate==='function'?previous.expiresAt.toDate():null;
+   const expired=expiry&&expiry.getTime()<=Date.now();
+   const activeCount=expired?0:current;
+   if(activeCount>=8)throw Error('Kartu sudah penuh! Hubungi Oci untuk klaim hadiah 🎁');
+   const nowDate=new Date();
+   const expiryDate=new Date(nowDate.getTime());
+   expiryDate.setUTCMonth(expiryDate.getUTCMonth()+3);
+   tx.update(codeRef,{used:true,redeemedBy:hash});
+   tx.set(cardRef,{count:activeCount+1,lastCode:code,updatedAt:nowDate.toISOString(),expiresAt:expiryDate});
+  });
+  input.value='';alert('YEAAY! 🍓 Satu stamp berhasil ditempel dan tersimpan!');
+ }catch(err){console.error(err);alert('Belum berhasil: '+err.message+' ♡')}
+ finally{button.disabled=false;button.textContent='Tempel Stamp 🍓'}
+});
+
+// V14: reset hanya setelah admin mengonfirmasi hadiah sudah diserahkan.
+const resetRewardButton=document.getElementById('oci-reward-reset-btn');
+const resetRewardStatus=document.getElementById('oci-reward-reset-status');
+resetRewardButton.addEventListener('click',async()=>{
+ if(!auth.currentUser||auth.currentUser.uid!==adminUID){resetRewardStatus.textContent='Login sebagai admin Oci terlebih dahulu ♡';return}
+ const phone=normPhone(document.getElementById('oci-reward-reset-phone').value);
+ if(!phone){resetRewardStatus.textContent='Nomor WhatsApp belum valid ♡';return}
+ resetRewardButton.disabled=true;
+ resetRewardStatus.textContent='Memeriksa kartu loyalty...';
+ try{
+  const hash=await phoneHash(phone),cardRef=doc(db,'loyaltyCards',hash);
+  const card=await getDoc(cardRef);
+  if(!card.exists()||Number(card.data().count)!==8)throw Error('Kartu nomor ini belum mencapai 8/8 stamp.');
+  const expiry=card.data().expiresAt;
+  if(expiry&&typeof expiry.toDate==='function'&&expiry.toDate().getTime()<=Date.now())throw Error('Kartu ini sudah kedaluwarsa. Periksa manual dahulu.');
+  if(!confirm('Pastikan hadiah SUDAH diberikan kepada nomor +'+phone+'. Reset 8 stamp menjadi 0?')){resetRewardStatus.textContent='Reset dibatalkan ♡';return}
+  await runTransaction(db,async tx=>{
+   const snap=await tx.get(cardRef);
+   if(!snap.exists()||Number(snap.data().count)!==8)throw Error('Kartu berubah atau tidak lagi 8/8. Muat ulang dan cek.');
+   tx.update(cardRef,{count:0,updatedAt:new Date().toISOString()});
+  });
+  resetRewardStatus.textContent='🎀 Berhasil! Kartu buyer kembali 0/8. Hadiah sudah dikonfirmasi ♡';
+  document.getElementById('oci-reward-reset-phone').value='';
+ }catch(err){console.error(err);resetRewardStatus.textContent='Belum berhasil: '+err.message}
+ finally{resetRewardButton.disabled=false}
+});
+let cloudRecords=[],unsub=null,authorized=false;
+let refreshAdminView=()=>{};
+const authForm=document.getElementById('oci-auth-form'),authStatus=document.getElementById('oci-auth-status'),logout=document.getElementById('oci-auth-logout');
+const adminPanel=document.querySelector('.oci-admin-private');
+authForm.addEventListener('submit',async e=>{e.preventDefault();authStatus.textContent='Memeriksa akun...';const guard=setTimeout(()=>{if(authStatus.textContent==='Memeriksa akun...')authStatus.textContent='Koneksi login terlalu lama. Buka lewat GitHub Pages (HTTPS), bukan file Downloads, dan cek internet.'},12000);try{await signInWithEmailAndPassword(auth,document.getElementById('oci-auth-email').value.trim(),document.getElementById('oci-auth-password').value)}catch(err){authStatus.textContent='Login gagal: '+err.message}finally{clearTimeout(guard)}});
+logout.onclick=()=>signOut(auth);
+onAuthStateChanged(auth,user=>{
+  if(unsub){unsub();unsub=null}authorized=!!user&&user.uid===adminUID;
+  authForm.style.display=authorized?'none':'block';logout.style.display=authorized?'inline-block':'none';adminPanel.style.display=authorized?'block':'none';
+  authStatus.textContent=authorized?'✓ Login admin berhasil · data online tersinkron ♡':user?'Akun ini bukan admin Oci. Silakan keluar dan login dengan akun admin.':'Login untuk mengelola invoice dan stamp ♡';
+  cloudRecords=[];
+  if(authorized){unsub=onSnapshot(ordersRef,snap=>{cloudRecords=snap.docs.map(d=>({...d.data(),id:d.id}));refreshAdminView()},err=>{authStatus.textContent='Gagal memuat Firestore: '+err.message})}
+  refreshAdminView();
+});
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const read=()=>{const seen=new Set();return cloudRecords.filter(x=>{const key=x.draftId?'draft:'+x.draftId:'id:'+x.id;if(seen.has(key))return false;seen.add(key);return true})};
+const write=async v=>{
+  if(!authorized){alert('Login admin Firebase dulu ya ♡');return}
+  const before=cloudRecords,old=new Map(before.map(x=>[x.id,x]));
+  const next=new Map(v.map(x=>[x.id,x]));
+  const batch=writeBatch(db);
+  before.forEach(x=>{if(!next.has(x.id))batch.delete(doc(db,'orders',x.id))});
+  v.forEach(x=>{if(JSON.stringify(old.get(x.id))!==JSON.stringify(x)){const {id,...data}=x;batch.set(doc(db,'orders',id),data)}});
+  for(const x of v){
+   const previous=old.get(x.id);
+   if(x.stampCode && (!previous || previous.stampCode!==x.stampCode)){
+    const phone=normPhone(x.phone);
+    if(x.status!=='paid'||!x.proof||Number(x.price)<20000||!phone)continue;
+    const hash=await phoneHash(phone);
+    batch.set(doc(db,'stampCodes',x.stampCode),{used:false,phoneHash:hash,orderId:String(x.id),createdAt:new Date().toISOString()});
+   }
+  }
+  const phones=new Set([...before,...v].map(x=>normPhone(x.phone)).filter(Boolean));
+  for(const phone of phones){
+   const hash=await phoneHash(phone);
+   const orders=v.filter(x=>normPhone(x.phone)===phone).map(x=>({id:String(x.id||''),product:String(x.product||''),price:Number(x.price||0),date:String(x.date||''),status:x.status==='paid'?'paid':'pending',proof:!!x.proof,accountEmail:x.status==='paid'?String(x.accountEmail||''):''}));
+   batch.set(doc(db,'buyerStatus',hash),{orders,updatedAt:new Date().toISOString()});
+  }
+  try{await batch.commit()}catch(err){alert('Gagal menyimpan Firebase: '+err.message)}
+};
+const iso=d=>d.toISOString().slice(0,10);
+const today=iso(new Date());$('oci-ad-date').value=today;
+const draftKey='oci_order_drafts_v1';
+const drafts=()=>{try{return JSON.parse(localStorage.getItem(draftKey)||'[]')||[]}catch(e){return []}};
+const parsePrice=v=>Number(String(v||'').replace(/[^0-9]/g,''))||0;
+const uid=()=>globalThis.crypto?.randomUUID?.()||String(Date.now())+Math.random();
+const stampCode=()=>{const a=new Uint8Array(12);crypto.getRandomValues(a);return 'BERRY-'+Array.from(a,b=>b.toString(16).padStart(2,'0')).join('').toUpperCase()};
+const money=n=>'Rp'+Number(n||0).toLocaleString('id-ID');
+const daysLeft=date=>{const a=new Date(today+'T12:00:00'),b=new Date(date+'T12:00:00');return Math.round((b-a)/86400000)};
+const wa=p=>{let n=String(p).replace(/\D/g,'');if(n.startsWith('0'))n='62'+n.slice(1);return /^62\d{8,13}$/.test(n)?n:null};
+const months=()=>{const list=read(),months=new Set([today.slice(0,7),...list.map(x=>x.date.slice(0,7))]);const select=$('oci-ad-month'),old=select.value;select.replaceChildren();[...months].sort().reverse().forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=new Date(m+'-01T12:00:00').toLocaleDateString('id-ID',{month:'long',year:'numeric'});select.append(o)});select.value=months.has(old)?old:today.slice(0,7)};
+const btn=(txt,fn)=>{const b=document.createElement('button');b.className='b v';b.type='button';b.textContent=txt;b.onclick=fn;return b};
+function renderInbox(){const root=$('oci-ad-inbox');root.replaceChildren();const all=read();const pending=[...new Map(drafts().filter(x=>x.id).map(x=>[x.id,x])).values()].filter(x=>!all.some(y=>y.draftId===x.id));if(!pending.length){const p=document.createElement('p');p.className='oci-admin-note';p.textContent='Belum ada draft invoice baru di perangkat ini ♡';root.append(p)}pending.forEach((x,i)=>{const c=document.createElement('div');c.className='oci-admin-item';const title=document.createElement('b');title.textContent='🧾 '+x.product+' · '+x.package;c.append(title);const d=document.createElement('p');d.textContent=(x.price||'')+' · '+new Date(x.date).toLocaleString('id-ID');c.append(d);c.append(btn('Ambil ke rekap & verifikasi',()=>{const name=prompt('Nama buyer (boleh dikosongkan):','')||'Buyer';const phone=prompt('Nomor WhatsApp buyer (isi setelah cek chat):','')||'';const date=(x.date||today).slice(0,10);const a=read();if(a.some(y=>y.draftId===x.id)){alert('Draft ini sudah tercatat, tidak dibuat dua kali ♡');return}a.push({id:'draft-'+x.id,draftId:x.id,name,phone,product:x.product+' · '+x.package,price:parsePrice(x.price),date,expiry:'',status:'pending',proof:false,reminded:false,stamp:false});write(a)}));root.append(c)})}
+function renderStamps(){const root=$('oci-ad-stamps');root.replaceChildren();const filter=$('oci-ad-stamp-filter').value;let arr=read();const eligible=x=>x.status==='paid'&&x.proof&&x.price>=20000&&wa(x.phone);arr=arr.filter(x=>filter==='all'||(filter==='eligible'&&eligible(x)&&!x.stampCode)||(filter==='issued'&&!!x.stampCode)||(filter==='waiting'&&!eligible(x)));if(!arr.length){const p=document.createElement('p');p.className='oci-admin-note';p.textContent='Belum ada order di kategori ini ♡';root.append(p)}arr.forEach(x=>{const c=document.createElement('div');c.className='oci-admin-item';const t=document.createElement('b');t.textContent='🍓 '+x.name+' · '+x.product;c.append(t);const d=document.createElement('p');d.textContent=money(x.price)+' · '+(x.phone||'Nomor WA belum diisi')+' · '+(x.stampCode?'Kode stamp siap dikirim':eligible(x)?'Layak dibuatkan kode':x.price<20000?'Tidak dapat stamp: minimum Rp20.000':!wa(x.phone)?'Isi nomor WA valid dahulu':x.status!=='paid'?'Tunggu verifikasi lunas':'Tunggu bukti login');c.append(d);const actions=document.createElement('div');actions.className='oci-admin-actions';actions.append(btn('✏️ Edit tanggal & buyer',()=>{const name=prompt('Nama buyer',x.name);if(name===null)return;const phone=prompt('Nomor WhatsApp',x.phone||'');if(phone===null)return;const expiry=prompt('Tanggal berakhir (YYYY-MM-DD)',x.expiry||'');if(expiry===null)return;update(x.id,{name,phone,expiry})}),btn(x.status==='paid'?'↩ Batalkan lunas':'💳 Verifikasi lunas',()=>update(x.id,{status:x.status==='paid'?'pending':'paid'})),btn(x.proof?'↩ Batalkan bukti login':'📸 Bukti login diterima',()=>update(x.id,{proof:!x.proof})),btn('💌 Isi email akun',()=>{const email=prompt('Email akun premium untuk buyer (kosongkan jika belum tersedia):',x.accountEmail||'');if(email===null)return;const value=email.trim();if(value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)){alert('Format email belum benar ♡');return}update(x.id,{accountEmail:value})}),btn('✏️ Edit WA / tanggal',()=>{const phone=prompt('Nomor WhatsApp',x.phone||'');if(phone===null)return;const expiry=prompt('Tanggal akun berakhir (YYYY-MM-DD)',x.expiry||'');if(expiry===null)return;update(x.id,{phone,expiry})}));if(x.stampCode){const note=document.createElement('p');note.textContent='🎟️ Kode unik: '+x.stampCode+' · kirim ke buyer via WA';c.append(note);actions.append(btn('📋 Salin kode',()=>navigator.clipboard.writeText(x.stampCode).then(()=>alert('Kode disalin ♡')).catch(()=>prompt('Salin kode:',x.stampCode))))}else if(eligible(x)){actions.append(btn('🎟️ Buat kode stamp unik',()=>{if(confirm('Buat kode satu kali untuk order ini?'))update(x.id,{stampCode:stampCode(),stampIssuedAt:new Date().toISOString()})}))}c.append(actions);root.append(c)})}
+function render(){renderInbox();renderStamps();months();const all=read(),selected=$('oci-ad-month').value,arr=all.filter(x=>x.date.slice(0,7)===selected).sort((a,b)=>b.date.localeCompare(a.date));$('oci-ad-summary').textContent=arr.length+' order · '+money(arr.reduce((sum,x)=>sum+(x.status==='paid'?Number(x.price):0),0))+' pembayaran dicatat lunas (manual)';const list=$('oci-ad-list');list.replaceChildren();if(!arr.length){const p=document.createElement('p');p.className='sub';p.textContent='Belum ada catatan order di bulan ini ♡';list.append(p)}
+arr.forEach(x=>{const card=document.createElement('div');card.className='oci-admin-item';const title=document.createElement('b');title.textContent=x.name+' · '+x.product;card.append(title);const lines=[x.phone+' · '+money(x.price), 'Order '+x.date+' · berakhir '+(x.expiry||'belum diisi'), x.status==='paid'?'💗 Pembayaran dicek lunas':'⏳ Belum diverifikasi',x.proof?'📸 Bukti login diterima':'📸 Bukti login belum diterima',x.accountEmail?'💌 Email akun: '+x.accountEmail:'💌 Email akun belum diisi',x.reminded?'💌 Sudah diingatkan':'💌 Belum diingatkan'];lines.forEach(t=>{const p=document.createElement('p');p.textContent=t;card.append(p)});const actions=document.createElement('div');actions.className='oci-admin-actions';actions.append(btn('✏️ Edit tanggal & buyer',()=>{const name=prompt('Nama buyer',x.name);if(name===null)return;const phone=prompt('Nomor WhatsApp',x.phone||'');if(phone===null)return;const expiry=prompt('Tanggal berakhir (YYYY-MM-DD)',x.expiry||'');if(expiry===null)return;update(x.id,{name,phone,expiry})}),btn(x.status==='paid'?'Tandai belum lunas':'Tandai lunas (manual)',()=>update(x.id,{status:x.status==='paid'?'pending':'paid'})),btn(x.proof?'Batalkan bukti login':'Bukti login diterima',()=>update(x.id,{proof:!x.proof})),btn(x.reminded?'Reset reminder':'Sudah diingatkan',()=>update(x.id,{reminded:!x.reminded})),btn('💌 Isi email akun',()=>{const email=prompt('Email akun premium untuk buyer:',x.accountEmail||'');if(email===null)return;const value=email.trim();if(value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)){alert('Format email belum benar ♡');return}update(x.id,{accountEmail:value})}));const num=wa(x.phone);if(num){const a=document.createElement('a');a.className='b g';a.target='_blank';a.rel='noopener';a.textContent='Ingatkan via WA ↗';a.href='https://wa.me/'+num+'?text='+encodeURIComponent('Halo kak '+x.name+'! 🎀 Aku Oci dari Oci’s Little Land. Langganan '+x.product+' kamu berakhir pada '+x.expiry+'. Mau diperpanjang atau tidak, kak? Terima kasih 🍓');actions.append(a)}actions.append(btn('Hapus',()=>{if(confirm('Hapus catatan order ini dari perangkat?')){write(read().filter(y=>y.id!==x.id));render()}}));card.append(actions);list.append(card)});
+const reminders=$('oci-ad-reminders');reminders.replaceChildren();const due=all.filter(x=>x.expiry&&!x.reminded&&[3,1].includes(daysLeft(x.expiry)));if(!due.length){const p=document.createElement('p');p.className='sub';p.textContent='Belum ada reminder H-3 / H-1 hari ini ♡';reminders.append(p)}due.forEach(x=>{const p=document.createElement('div');p.className='oci-admin-item';p.textContent='🔔 H-'+daysLeft(x.expiry)+' · '+x.name+' · '+x.product+' · '+x.expiry;const n=wa(x.phone);if(n){const a=document.createElement('a');a.className='b g';a.style.marginLeft='8px';a.target='_blank';a.rel='noopener';a.textContent='WhatsApp ↗';a.href='https://wa.me/'+n+'?text='+encodeURIComponent('Halo kak '+x.name+'! 🎀 Langganan '+x.product+' kamu akan berakhir '+x.expiry+'. Mau perpanjang, kak? 🍓');p.append(a)}p.append(btn('Sudah diingatkan',()=>update(x.id,{reminded:true})));reminders.append(p)})}
+function update(id,patch){const a=read().map(x=>{if(x.id!==id)return x;const y={...x,...patch};if(!y.stampCode&&y.status==='paid'&&y.proof&&Number(y.price)>=20000&&wa(y.phone)){y.stampCode=stampCode();y.stampIssuedAt=new Date().toISOString()}y.stamp=!!y.stampCode;return y});write(a)}
+$('oci-admin-form').addEventListener('submit',e=>{e.preventDefault();const name=$('oci-ad-name').value.trim(),phone=$('oci-ad-phone').value.trim(),product=$('oci-ad-product').value.trim(),price=Number($('oci-ad-price').value),date=$('oci-ad-date').value,expiry=$('oci-ad-expiry').value;if(!wa(phone)){alert('Nomor WhatsApp Indonesia belum valid ♡');return}if(!name||!product||!date||!expiry||expiry<date||price<0){alert('Periksa data dan tanggal berakhir ya ♡');return}const v=read();v.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random(),name,phone,product,price,date,expiry,status:$('oci-ad-status').value,proof:$('oci-ad-proof').checked,reminded:false});if(v[v.length-1].status==='paid'&&v[v.length-1].proof&&price>=20000){v[v.length-1].stampCode=stampCode();v[v.length-1].stampIssuedAt=new Date().toISOString()}v[v.length-1].stamp=!!v[v.length-1].stampCode;write(v);e.target.reset();$('oci-ad-date').value=today;render();alert('Catatan dikirim ke Firebase admin ♡')});$('oci-ad-month').onchange=render;$('oci-ad-stamp-filter').onchange=render;
+$('oci-ad-export').onclick=()=>{const fields=['name','phone','product','price','date','expiry','status','proof','reminded'];const rows=[fields,...read().filter(x=>x.date.slice(0,7)===$('oci-ad-month').value).map(x=>fields.map(k=>String(x[k]??'')))];const csv='﻿'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='oci-rekap-'+$('oci-ad-month').value+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+refreshAdminView=render;
+render();
+})();
+</script>
+</body>
+</html>
